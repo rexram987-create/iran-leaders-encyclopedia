@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אנציקלופדיית מנהיגי איראן - פרויקט מחקר</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React and ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons - Fixed Loading Strategy -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: #020617; /* slate-950 */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .zoom-overlay {
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+
+        // Custom Icon component to handle Lucide icons in a browser/UMD environment
+        const Icon = ({ name, className = "w-6 h-6", ...props }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+
+            return <i data-lucide={name} className={className} {...props}></i>;
+        };
+
+        const App = () => {
+            const [selectedLeader, setSelectedLeader] = useState(null);
+            const [enlargedImage, setEnlargedImage] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+
+            // Data for 13 Iranian Leaders with correct mapping
+            const leaders = useMemo(() => [
+                {
+                    id: 1,
+                    fullName: "סייד רוחאללה מוסאווי ח'ומייני",
+                    role: "מייסד המהפכה האסלאמית והמנהיג העליון הראשון",
+                    years: "1902–1989",
+                    imageUrl: "https://i.postimg.cc/zLrpCKBF/1770134682965.png",
+                    etymology: "סייד (תואר): צאצא הנביא. רוחאללה (שם פרטי): 'רוח האל'. מוסאווי (שם אמצעי): ייחוס לאימאם מוסא אל-כאז'ם. ח'ומייני (שם משפחה): מוצא מהעיר ח'ומיין.",
+                    childhood: "נולד בח'ומיין. אביו נרצח כשהיה תינוק. גדל תחת חסות אמו, האג'ר סגאפי, ודתו סהיבה. לאחר מותן כשהיה בן 15, גדל אצל אחיו ולמד בקום פילוסופיה ומיסטיקה.",
+                    ideology: "ולאית-י פקיה (שלטון חכם ההלכה). סמכות דתית ופוליטית מוחלטת בידי פוסק ההלכה הבכיר.",
+                    achievements: "הפלת המלוכה פהלווי, ייסוד הרפובליקה האסלאמית ועיצוב המבנה התיאוקרטי של איראן.",
+                    riseReason: "כריזמה דתית עצומה והתנגדות בלתי מתפשרת לשאה.",
+                    riseYear: "1979"
+                },
+                {
+                    id: 2,
+                    fullName: "סייד עלי חוסייני ח'אמנאי",
+                    role: "המנהיג העליון השני של איראן",
+                    years: "1939–הווה",
+                    imageUrl: "https://i.postimg.cc/wtpFXLvc/1770134687898.png",
+                    etymology: "סייד (תואר): צאצא הנביא. עלי (שם פרטי). חוסייני (שם אמצעי): ייחוס לאימאם חוסיין. ח'אמנאי (שם משפחה): מוצא מהעיירה ח'אמנה.",
+                    childhood: "נולד במשהד למשפחה דתית ענייה. למד במדרשות במשהד ובקום. שרד ניסיון התנקשות ב-1981 שהותיר את ידו הימנית משותקת. כיהן כנשיא בתקופת המלחמה.",
+                    ideology: "שמרנות רדיקלית ו'כלכלת התנגדות'. דוגל בעצמאות מוחלטת מהמערב וחיזוק ציר ההתנגדות.",
+                    achievements: "ביסוס שלטון היחיד לאורך למעלה מ-35 שנה וקידום תוכנית הגרעין והטילים.",
+                    riseReason: "נבחר על ידי מועצת המומחים לאחר מות ח'ומייני.",
+                    riseYear: "1989"
+                },
+                {
+                    id: 3,
+                    fullName: "מוחמד רזא פהלווי",
+                    role: "השאה האחרון (שושלת פהלווי)",
+                    years: "1919–1980",
+                    imageUrl: "https://i.postimg.cc/3dxyzRyk/1770133509758.png",
+                    etymology: "מוחמד רזא: שמות דתיים. פהלווי: התייחסות לשפה הפרסית העתיקה, סמל ללאומיות חילונית.",
+                    childhood: "בנו של רזא שאה. התחנך בשווייץ וחזר לאיראן ב-1936. ילדותו הייתה בצל דמותו הסמכותית של אביו, מה שהשפיע על אופיו כמנהיג.",
+                    ideology: "מודרניזציה חילונית מואצת ('המערביזציה') וקשרים אסטרטגיים הדוקים עם ארה\"ב.",
+                    achievements: "המהפכה הלבנה, פיתוח כלכלי ותשתיתי עצום והפיכת איראן למעצמה אזורית.",
+                    riseReason: "ירושת אביו שהודח בלחץ בעלות הברית.",
+                    riseYear: "1941"
+                },
+                {
+                    id: 4,
+                    fullName: "מוחמד מוסאדק",
+                    role: "ראש הממשלה הלאומני",
+                    years: "1882–1967",
+                    imageUrl: "https://i.postimg.cc/7fZCj6CC/1770133514666.png",
+                    etymology: "מוחמד (שם פרטי). מוסאדק (שם משפחה): 'איש האמת' או 'המאומת'.",
+                    childhood: "נולד למשפחת אצולה קאג'ארית. האיראני הראשון עם דוקטורט למשפטים מאירופה. פיתח תודעה דמוקרטית ולאומית חזקה.",
+                    ideology: "ליברליזם לאומי וריבונות על משאבי הטבע. התנגדות להתערבות זרה (בריטית ואמריקאית).",
+                    achievements: "הלאמת תעשיית הנפט האיראנית ב-1951, צעד שהפך לסמל לעצמאות עמים.",
+                    riseReason: "נבחר בלחץ ציבורי אדיר שתמך בתוכנית הלאמת הנפט.",
+                    riseYear: "1951"
+                },
+                {
+                    id: 5,
+                    fullName: "עלי ארדשיר לאריג'אני",
+                    role: "יו\"ר המג'לס לשעבר",
+                    years: "1957–הווה",
+                    imageUrl: "https://i.postimg.cc/kBgVL4V8/1770132657450.png",
+                    etymology: "עלי (שם פרטי). ארדשיר (שם אמצעי): 'המלך הצדיק'. לאריג'אני (שם משפחה): מוצא מהאזור לאריג'אן.",
+                    childhood: "נולד בנג'ף (עיראק) למשפחת אייתוללה בכיר. למד מתמטיקה ופילוסופיה (דוקטורט על עמנואל קאנט).",
+                    ideology: "שמרנות טכנוקרטית ופרגמטית. מאמין בניהול מקצועי תחת פיקוח דתי עליון.",
+                    achievements: "כהונה של 12 שנים כיו\"ר הפרלמנט וניהול הסכמים אסטרטגיים עם סין.",
+                    riseReason: "צמיחה בתוך הממסד הביטחוני והתקשורתי (רשות השידור).",
+                    riseYear: "2008"
+                },
+                {
+                    id: 6,
+                    fullName: "מחמוד אחמדינז'אד",
+                    role: "נשיא איראן השישי (פופוליסט)",
+                    years: "1956–הווה",
+                    imageUrl: "https://i.postimg.cc/PP5L0xLm/1770132662034.png",
+                    etymology: "מחמוד (שם פרטי): 'המהולל'. אחמדינז'אד (שם משפחה): 'מזרעו של אחמד'.",
+                    childhood: "בנו של נפח עני שעבר לטהראן. למד הנדסה אזרחית והיה פעיל בארגוני סטודנטים אסלאמיים קיצוניים.",
+                    ideology: "פופוליזם דתי משיחי. קו אנטי-מערבי לוחמני ודגש על חלוקת עושר לשכבות החלשות.",
+                    achievements: "האצת פרויקט הגרעין ועימות חזיתי עם הקהילה הבינלאומית.",
+                    riseReason: "נתפס כ'איש העם' הנקי משחיתות לעומת האליטה הישנה.",
+                    riseYear: "2005"
+                },
+                {
+                    id: 7,
+                    fullName: "סייד חסן רוחאני",
+                    role: "נשיא איראן השביעי (מתון)",
+                    years: "1948–הווה",
+                    imageUrl: "https://i.postimg.cc/F7HfwRfk/1770132675434.png",
+                    etymology: "סייד (תואר). חסן (שם פרטי). רוחאני (שם משפחה): 'רוחני'. נולד בשם 'פרידון' אך שינה להדגשת ייעודו.",
+                    childhood: "נולד בסורח'ה. שילב השכלה דתית גבוהה עם דוקטורט במשפטים מסקוטלנד.",
+                    ideology: "פרגמטיזם אסלאמי ודיאלוג בונה עם המערב לטובת הכלכלה.",
+                    achievements: "היה האדריכל של הסכם הגרעין (JCPOA) ב-2015 והורדת סנקציות.",
+                    riseReason: "הבטחה לפתרון בעיות המדינה דרך דיפלומטיה.",
+                    riseYear: "2013"
+                },
+                {
+                    id: 8,
+                    fullName: "מוחמד ג'וואד זריף",
+                    role: "סגן נשיא ושר החוץ לשעבר",
+                    years: "1960–הווה",
+                    imageUrl: "https://i.postimg.cc/06sZYDQp/1770134858997.png",
+                    etymology: "מוחמד ג'וואד: שמות דתיים. זריף (שם משפחה): 'שנון' או 'מתוחכם' בפרסית.",
+                    childhood: "גדל בבית דתי אמיד בטהראן. למד בארה\"ב מגיל 17 וסיים דוקטורט ביחסים בינלאומיים.",
+                    ideology: "דיפלומטיה ריאליסטית. מאמין בשימוש בכוח רך ובהגעה להסכמים להבטחת האינטרס הלאומי.",
+                    achievements: "היה הפנים של איראן בשיחות הגרעין והדיפלומט המוכר ביותר שלה במערב.",
+                    riseReason: "מינוי מקצועי בזכות ניסיונו הרב כשגריר באו\"ם.",
+                    riseYear: "2013"
+                },
+                {
+                    id: 9,
+                    fullName: "קאסם סולימאני",
+                    role: "מפקד כוח קודס (משמרות המהפכה)",
+                    years: "1957–2020",
+                    imageUrl: "https://i.postimg.cc/8jzFx5Fs/1770132682840.png",
+                    etymology: "קאסם (שם פרטי): 'המחלק'. סולימאני (שם משפחה): על שם שלמה המלך.",
+                    childhood: "נולד בכפר עני במחוז כרמאן. עבד בבנייה בצעירותו כדי לעזור למשפחתו לשלם חובות.",
+                    ideology: "ייצוא המהפכה דרך בניית רשת מיליציות אזורית ('ציר ההתנגדות').",
+                    achievements: "הפיכת כוח קודס לזרוע אסטרטגית עולמית והובלת הלחימה בדאעש.",
+                    riseReason: "הצטיינות צבאית יוצאת דופן וקירבה אישית למנהיג העליון.",
+                    riseYear: "1998"
+                },
+                {
+                    id: 10,
+                    fullName: "סייד מוחמד ח'אתמי",
+                    role: "נשיא איראן החמישי (רפורמיסט)",
+                    years: "1943–הווה",
+                    imageUrl: "https://i.postimg.cc/bswG4JG2/1770132667045.png",
+                    etymology: "סייד (תואר). מוחמד (שם פרטי). ח'אתמי (שם משפחה): נגזר מהשורש 'ח'תם' (חותם).",
+                    childhood: "נולד בארדכאן למשפחת איש דת בולט. שימש כמנהל המרכז האסלאמי בהמבורג לפני המהפכה.",
+                    ideology: "דמוקרטיה אסלאמית ו'דיאלוג בין תרבויות' לשיפור זכויות האזרח.",
+                    achievements: "תקופת 'אביב איראני' של פריחה עיתונאית ותרבותית ושיפור היחסים עם אירופה.",
+                    riseReason: "ניצחון סוחף בתמיכת צעירים ונשים שדרשו חופש חברתי.",
+                    riseYear: "1997"
+                },
+                {
+                    id: 11,
+                    fullName: "מסעוד פזשכיאן",
+                    role: "נשיא איראן הנוכחי",
+                    years: "1954–הווה",
+                    imageUrl: "https://i.postimg.cc/XGzVhwr6/1770134866755.png",
+                    etymology: "מסעוד (שם פרטי): 'מאושר'. פזשכיאן (שם משפחה): 'משפחת הרופאים'.",
+                    childhood: "נולד במהאבאד למשפחה אזרית-כורדית. רופא מנתח לב ששירת במלחמת איראן-עיראק.",
+                    ideology: "רפורמיזם זהיר ואחדות פנימית לשיפור המצב הכלכלי וזכויות האזרח.",
+                    achievements: "החזרת התקווה למחנה הרפורמיסטי ומינוי קבינט מגוון יחסית.",
+                    riseReason: "ניצחון בבחירות בזק ב-2024 לאחר מות ראיסי.",
+                    riseYear: "2024"
+                },
+                {
+                    id: 12,
+                    fullName: "סייד אבראהים ראיסי",
+                    role: "נשיא איראן השביעי (המנוח)",
+                    years: "1960–2024",
+                    imageUrl: "https://i.postimg.cc/JtqDTJhN/1770132690656.png",
+                    etymology: "סייד (תואר). אבראהים (שם פרטי). ראיסי (שם משפחה): 'נשיאותי' או 'ראש'.",
+                    childhood: "נולד במשהד. השתלב במערכת המשפט המהפכנית כבר בגיל 20 והיה מעורב בדיכוי התנגדות.",
+                    ideology: "שמרנות רדיקלית ונאמנות מוחלטת למנהיג העליון תוך אכיפה מחמירה של חוקי המוסר.",
+                    achievements: "הידוק השליטה השמרנית בכל מוסדות המדינה והצטרפות ל-BRICS.",
+                    riseReason: "תמיכה מלאה של הממסד הדתי והצבאי בבחירות 2021.",
+                    riseYear: "2021"
+                },
+                {
+                    id: 13,
+                    fullName: "סייד עבאס עראקצ'י",
+                    role: "שר החוץ של איראן",
+                    years: "1962–הווה",
+                    imageUrl: "https://i.postimg.cc/RNn4XndN/1770134866755.png",
+                    etymology: "סייד (תואר). עבאס (שם פרטי): 'אריה'. עראקצ'י (שם משפחה): 'יצרן תזקיקים'.",
+                    childhood: "נולד בטהראן למשפחת סוחרים. שירת במשמרות המהפכה וקיבל דוקטורט מבריטניה.",
+                    ideology: "דיפלומטיה המשרתת את האינטרסים המהפכניים דרך משא ומתן מקצועי וקשוח.",
+                    achievements: "המנהל הטכני של שיחות הגרעין ב-2015. כיום מוביל את יחסי החוץ של ממשל פזשכיאן.",
+                    riseReason: "מינוי מקצועי בזכות ניסיונו העצום בזירה הבינלאומית.",
+                    riseYear: "2024"
+                }
+            ], []);
+
+            const filteredLeaders = leaders.filter(l => 
+                l.fullName.includes(searchTerm) || l.role.includes(searchTerm)
+            );
+
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, []);
+
+            return (
+                <div className="min-h-screen bg-slate-950 text-slate-100 p-4 font-sans select-none overflow-x-hidden">
+                    <header className="max-w-4xl mx-auto py-8 text-center">
+                        <div className="bg-amber-500/20 p-4 rounded-3xl inline-block mb-4 border border-amber-500/30 shadow-2xl">
+                            <Icon name="book-open" className="text-amber-500 w-10 h-10" />
+                        </div>
+                        <h1 className="text-3xl font-black text-amber-500 mb-2 tracking-tight">אנציקלופדיית מנהיגי איראן</h1>
+                        <p className="text-slate-400 text-sm max-w-md mx-auto italic">מחקר ביוגרפי, אידיאולוגי ואטימולוגי מלא</p>
+                        
+                        <div className="relative group mt-8 max-w-md mx-auto px-2">
+                            <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-amber-500">
+                                <Icon name="search" className="w-6 h-6" />
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="חפש מנהיג או תפקיד..." 
+                                className="w-full bg-slate-900 border border-slate-800 rounded-3xl py-5 pr-14 pl-4 text-base focus:outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/20 shadow-2xl transition-all placeholder-slate-600"
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </header>
+
+                    <main className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 pb-24">
+                        {filteredLeaders.map((leader) => (
+                            <div 
+                                key={leader.id}
+                                className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-6 shadow-xl relative overflow-hidden group flex flex-col"
+                            >
+                                <div className="absolute top-0 left-0 w-2 h-full bg-amber-600/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="flex gap-5 items-start">
+                                    <div 
+                                        className="w-28 h-28 bg-slate-800 rounded-[2rem] flex-shrink-0 overflow-hidden border border-slate-700 shadow-inner relative cursor-zoom-in"
+                                        onClick={() => setEnlargedImage(leader.imageUrl)}
+                                    >
+                                        <img 
+                                            src={leader.imageUrl} 
+                                            alt={leader.fullName} 
+                                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                            loading="lazy"
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Icon name="maximize-2" className="text-white w-6 h-6" />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0 pt-1" onClick={() => setSelectedLeader(leader)}>
+                                        <h2 className="text-xl font-bold text-slate-50 truncate leading-tight cursor-pointer">{leader.fullName}</h2>
+                                        <span className="text-[11px] font-black bg-amber-900/30 text-amber-400 px-3 py-1 rounded-full mb-3 inline-block italic border border-amber-900/40 mt-2">{leader.years}</span>
+                                        <p className="text-amber-600 text-[11px] font-bold uppercase tracking-widest truncate">{leader.role}</p>
+                                    </div>
+                                </div>
+                                <div className="mt-5 pt-5 border-t border-slate-800/50 cursor-pointer" onClick={() => setSelectedLeader(leader)}>
+                                    <p className="text-slate-400 text-xs line-clamp-2 leading-relaxed">{leader.etymology}</p>
+                                    <div className="mt-5 flex items-center text-amber-500 text-[12px] font-black uppercase tracking-tighter">
+                                        קרא את המחקר המלא <Icon name="chevron-left" className="w-4 h-4 mr-1" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </main>
+
+                    {selectedLeader && (
+                        <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-0 sm:p-6">
+                            <div className="absolute inset-0 bg-black/98 backdrop-blur-2xl" onClick={() => setSelectedLeader(null)}></div>
+                            <div className="bg-slate-900 w-full max-w-2xl max-h-[94vh] overflow-y-auto rounded-t-[3.5rem] sm:rounded-[3.5rem] relative shadow-2xl border border-slate-800 flex flex-col scrollbar-hide animate-in slide-in-from-bottom duration-500">
+                                <div className="p-8 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+                                    <div className="flex items-center gap-6">
+                                        <div 
+                                            className="w-24 h-24 bg-slate-800 rounded-[2.5rem] overflow-hidden border border-slate-700 shadow-2xl cursor-zoom-in group"
+                                            onClick={(e) => { e.stopPropagation(); setEnlargedImage(selectedLeader.imageUrl); }}
+                                        >
+                                            <img src={selectedLeader.imageUrl} className="w-full h-full object-cover" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-black text-amber-500 leading-tight">{selectedLeader.fullName}</h2>
+                                            <p className="text-xs text-slate-500 font-bold uppercase mt-1 tracking-widest">{selectedLeader.role}</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setSelectedLeader(null)} className="bg-slate-800 p-4 rounded-full text-slate-400 hover:text-white shadow-2xl active:scale-90"><Icon name="x" className="w-6 h-6" /></button>
+                                </div>
+                                <div className="p-10 space-y-12">
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div className="bg-slate-800/40 p-5 rounded-[2rem] border border-slate-800 text-center shadow-inner">
+                                            <Icon name="history" className="text-amber-500 w-6 h-6 mx-auto mb-2" /><div className="text-[10px] text-slate-500 font-bold uppercase">שנת עלייה</div><div className="text-sm text-white font-black">{selectedLeader.riseYear}</div>
+                                        </div>
+                                        <div className="bg-slate-800/40 p-5 rounded-[2rem] border border-slate-800 text-center shadow-inner">
+                                            <Icon name="user" className="text-amber-500 w-6 h-6 mx-auto mb-2" /><div className="text-[10px] text-slate-500 font-bold uppercase">שנות חיים</div><div className="text-sm text-white font-black">{selectedLeader.years}</div>
+                                        </div>
+                                        <div className="bg-slate-800/40 p-5 rounded-[2rem] border border-slate-800 text-center flex flex-col justify-center shadow-inner">
+                                            <Icon name="shield-check" className="text-amber-500 w-6 h-6 mx-auto mb-2" /><div className="text-[10px] text-slate-500 font-bold uppercase mb-1">סטטוס</div><div className="text-xs text-amber-400 font-black">{selectedLeader.years.includes('הווה') ? 'פעיל' : 'מנוח'}</div>
+                                        </div>
+                                    </div>
+                                    <section className="bg-amber-500/5 p-8 rounded-[3rem] border border-amber-500/10 shadow-sm relative overflow-hidden group">
+                                        <h3 className="text-amber-500 font-black text-base mb-4 flex items-center"><Icon name="info" className="w-6 h-6 ml-3" /> ניתוח אטימולוגי מלא</h3>
+                                        <p className="text-slate-200 text-base leading-relaxed font-medium">{selectedLeader.etymology}</p>
+                                    </section>
+                                    <section>
+                                        <h3 className="text-slate-400 font-black text-xs mb-6 flex items-center uppercase tracking-widest border-r-4 border-amber-600 pr-5">ילדות וחינוך מוקדם</h3>
+                                        <p className="text-slate-300 text-base leading-relaxed whitespace-pre-wrap font-light">{selectedLeader.childhood}</p>
+                                    </section>
+                                    <section>
+                                        <h3 className="text-slate-400 font-black text-xs mb-6 flex items-center uppercase tracking-widest border-r-4 border-amber-600 pr-5">תפיסה אידיאולוגית</h3>
+                                        <div className="bg-slate-800/30 p-10 rounded-[3rem] border-l-8 border-amber-500 shadow-inner">
+                                            <p className="text-slate-300 text-base leading-relaxed italic font-medium">{selectedLeader.ideology}</p>
+                                        </div>
+                                    </section>
+                                    <section className="pb-16">
+                                        <h3 className="text-slate-400 font-black text-xs mb-6 flex items-center uppercase tracking-widest border-r-4 border-amber-600 pr-5">הישגים מרכזיים ותרומה היסטורית</h3>
+                                        <p className="text-slate-300 text-base leading-relaxed font-light">{selectedLeader.achievements}</p>
+                                        <div className="mt-12 p-8 bg-slate-800/40 rounded-[2.5rem] border border-slate-800 text-[12px] text-slate-500 italic font-bold">נסיבות עלייה לתפקיד: {selectedLeader.riseReason}</div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {enlargedImage && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 zoom-overlay" onClick={() => setEnlargedImage(null)}>
+                            <button className="absolute top-8 right-8 text-white/50 hover:text-white p-2"><Icon name="x" className="w-10 h-10" /></button>
+                            <img src={enlargedImage} className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl transition-transform duration-300 scale-100" />
+                        </div>
+                    )}
+                    <footer className="max-w-4xl mx-auto text-center py-16 border-t border-slate-900 mt-16 opacity-40">
+                        <p className="text-[11px] text-slate-600 font-bold uppercase tracking-widest mb-6">מקורות המחקר ואימות נתונים ויזואליים</p>
+                        <div className="flex flex-wrap justify-center gap-8 text-[10px] text-slate-500 font-black">
+                            <span>Encyclopædia Britannica</span><span>•</span><span>Washington Institute</span><span>•</span><span>CFR - Iran Profiles</span>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
