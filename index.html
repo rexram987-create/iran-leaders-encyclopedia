@@ -71,13 +71,16 @@
             const [selectedLeader, setSelectedLeader] = useState(null);
             const [enlargedImage, setEnlargedImage] = useState(null);
             const [searchTerm, setSearchTerm] = useState('');
+            // State חדש לניהול העמוד הנוכחי - ברירת מחדל: מנהיגי מדינה
+            const [activePage, setActivePage] = useState('state');
 
-            // Data for 13 leaders - Final Comprehensive Data Set
+            // Data for 14 leaders - Final Comprehensive Data Set with Categories
             const leaders = useMemo(() => [
                 {
                     id: 1,
                     fullName: "סייד רוחאללה מוסאווי ח'ומייני",
                     role: "מייסד המהפכה האסלאמית והמנהיג העליון הראשון",
+                    category: "state", // מנהיג מדינה
                     years: "1902–1989",
                     imageUrl: "https://i.postimg.cc/zLrpCKBF/1770134682965.png",
                     etymology: [
@@ -114,6 +117,7 @@
                     id: 2,
                     fullName: "סייד עלי חוסייני ח'אמנאי",
                     role: "המנהיג העליון השני של איראן",
+                    category: "state", // מנהיג מדינה
                     years: "1939–הווה",
                     imageUrl: "https://i.postimg.cc/wtpFXLvc/1770134687898.png",
                     etymology: [
@@ -150,6 +154,7 @@
                     id: 3,
                     fullName: "מוחמד רזא פהלווי",
                     role: "השאה האחרון של איראן",
+                    category: "state", // מנהיג מדינה
                     years: "1919–1980",
                     imageUrl: "https://i.postimg.cc/3dxyzRyk/1770133509758.png",
                     etymology: [
@@ -185,6 +190,7 @@
                     id: 4,
                     fullName: "מוחמד מוסאדק",
                     role: "ראש הממשלה הלאומני של איראן",
+                    category: "state", // מנהיג מדינה
                     years: "1882–1967",
                     imageUrl: "https://i.postimg.cc/7fZCj6CC/1770133514666.png",
                     etymology: [
@@ -219,6 +225,7 @@
                     id: 5,
                     fullName: "עלי ארדשיר לאריג'אני",
                     role: "יו\"ר המג'לס לשעבר ואסטרטג פוליטי",
+                    category: "official", // בכיר משטר
                     years: "1957–הווה",
                     imageUrl: "https://i.postimg.cc/kBgVL4V8/1770132657450.png",
                     etymology: [
@@ -254,6 +261,7 @@
                     id: 6,
                     fullName: "מחמוד אחמדינז'אד",
                     role: "נשיא איראן השישי (פופוליסט שמרני)",
+                    category: "state", // מנהיג מדינה
                     years: "1956–הווה",
                     imageUrl: "https://i.postimg.cc/PP5L0xLm/1770132662034.png",
                     etymology: [
@@ -262,7 +270,7 @@
                     ],
                     earlyLife: {
                         background: "נולד בכפר הקטן ארדאן ליד גארמסאר למשפחת נפח קשת יום. המשפחה עקרה לטהראן כשהיה תינוק בחיפוש אחר פרנסה וחיים טובים יותר. ילדותו בשכונות העוני של דרום טהראן עיצבה את תפיסתו הפופוליסטית ואת הזדהותו העמוקה עם ה'איש הקטן' הנאבק בממסד המושחת והאליטיסטי.",
-                        family: "אביו היה דמות סמכותית ודתית שהקפיד על חינוך שמרני נוקשה מאוד. השכלתו של מחמוד הייתה הכלי שלו למוביליות חברתית; הוא הצטיין בלימודים והפך למהנדס מוערך, אך שמר בקנאות על סגנון חיי פשטות וצנוע ששימש אותו מאוחר יותר בקריירה הפוליטית שלו כסמל לנאמנות לערכי העבודה והיושרה.",
+                        family: "אביו היה דמות סמכותית ודתית שהקפיד על חינוך שמרני נוקשה מאוד. השכלתו של מחמוד הייתה הכלי שלו למוביליות חברתית; הוא הצטיין בלימודים והפך למהנדס מוערך, אך שמר בקנאות על סגנון חיי פשטות וצנוע ששימש אותו מאוחר מאוחר יותר בקריירה הפוליטית שלו כסמל לנאמנות לערכי העבודה והיושרה.",
                         education: "למד הנדסה אזרחית באוניברסיטת המדע והטכנולוגיה בטהראן והיה פעיל מאוד בארגון סטודנטים אסלאמי קיצוני בתקופת המהפכה. הוא המשיך ללימודי דוקטורט בתכנון תחבורה, מה שהקנה לו תדמית של איש מקצוע בתקופתו כראש עיריית טהראן והוביל למינויו לתפקידים בכירים בממשל."
                     },
                     clothing: [
@@ -288,6 +296,7 @@
                     id: 7,
                     fullName: "סייד חסן רוחאני",
                     role: "נשיא איראן השביעי (מתון-פרגמטי)",
+                    category: "state", // מנהיג מדינה
                     years: "1948–הווה",
                     imageUrl: "https://i.postimg.cc/F7HfwRfk/1770132675434.png",
                     etymology: [
@@ -323,6 +332,7 @@
                     id: 8,
                     fullName: "מוחמד ג'וואד זריף",
                     role: "סגן נשיא ושר החוץ לשעבר של איראן",
+                    category: "official", // בכיר משטר
                     years: "1960–הווה",
                     imageUrl: "https://i.postimg.cc/06sZYDQp/1770134858997.png",
                     etymology: [
@@ -358,6 +368,7 @@
                     id: 9,
                     fullName: "קאסם סולימאני",
                     role: "מפקד כוח קודס המיתולוגי של משמרות המהפכה",
+                    category: "official", // בכיר משטר
                     years: "1957–2020",
                     imageUrl: "https://i.postimg.cc/8jzFx5Fs/1770132682840.png",
                     etymology: [
@@ -392,6 +403,7 @@
                     id: 10,
                     fullName: "סייד מוחמד ח'אתמי",
                     role: "נשיא איראן החמישי (רפורמיסט)",
+                    category: "state", // מנהיג מדינה
                     years: "1943–הווה",
                     imageUrl: "https://i.postimg.cc/bswG4JG2/1770132667045.png",
                     etymology: [
@@ -427,6 +439,7 @@
                     id: 11,
                     fullName: "מסעוד פזשכיאן",
                     role: "נשיא איראן הנוכחי",
+                    category: "state", // מנהיג מדינה
                     years: "1954–הווה",
                     imageUrl: "https://i.postimg.cc/XGzVhwr6/1770134866755.png",
                     etymology: [
@@ -461,12 +474,13 @@
                     id: 12,
                     fullName: "סייד אבראהים ראיסי",
                     role: "נשיא איראן השמיני (המנוח)",
+                    category: "state", // מנהיג מדינה
                     years: "1960–2024",
                     imageUrl: "https://i.postimg.cc/JtqDTJhN/1770132690656.png",
                     etymology: [
                         { label: "סייד", content: "תואר צאצאי הנביא מוחמד, המעיד על מעמדו המיוחס בתוך האליטה הדתית השמרנית והמחויבות העמוקה שלו למסורת השיעית הישנה והבלתי מתפשרת של עולם המדרשות הדתיות של קום ומשהד לאורך כל שנות חייו הבוגרים והציבוריים." },
                         { label: "אבראהים", content: "השם הפרטי, המקבילה הערבית לאברהם אבינו, סמל לאמונה עיוורת וצייתנות מוחלטת לרצון האל ולסמכות הדתית העליונה ביותר הקיימת עלי אדמות במדינת איראן המהפכנית והאסלאמית מאז ימי ח'ומייני." },
-                        { label: "ראיסי", content: "שם משפחה הנגזר מהמילה 'ראיס' שפירושה נשיא או ראש. משמעות השם היא 'מנהיגותי' או 'נשיאותי', שם שחזה במידה רבה מאוד את מסלול חייו הפוליטי המהיר והמוצלח בלב הממסד השמרני האיראני לאורך השנים." }
+                        { label: "ראיסי", content: "שם משפחה הנגזר מהמילה 'ראיס' שפירושו נשיא או ראש. משמעות השם היא 'מנהיגותי' או 'נשיאותי', שם שחזה במידה רבה מאוד את מסלול חייו הפוליטי המהיר והמוצלח בלב הממסד השמרני האיראני לאורך השנים." }
                     ],
                     earlyLife: {
                         background: "נולד במשהד למשפחה דתית עמוקה מאוד ומסורתית. הוא התייתם מאביו בגיל חמש בלבד וגדל בתנאים פשוטים וקשים ביותר בסביבה דתית מחמירה שעיצבה את אופיו הנוקשה, הממושמע והנאמן לממסד מגיל צעיר מאוד ובצורה אבסולוטית וחסרת ספקות.",
@@ -496,6 +510,7 @@
                     id: 13,
                     fullName: "סייד עבאס עראקצ'י",
                     role: "שר החוץ הנוכחי של איראן",
+                    category: "official", // בכיר משטר
                     years: "1962–הווה",
                     imageUrl: "https://i.postimg.cc/RNn4XndN/1770134866755.png",
                     etymology: [
@@ -529,53 +544,95 @@
                     rise: { reason: "מינוי מקצועי מובהק בזכות ניסיונו העצום בניהול משברים בינלאומיים ומומחיותו הטכנית בשיחות הגרעין המורכבות ביותר שנערכו מעולם בזירה העולמית הסוערת.", year: "2024" }
                 },
                 {
-    id: 14,
-    fullName: "עלי שמח'אני",
-    role: "יועץ בכיר למנהיג העליון ומזכיר המועצה לביטחון לאומי לשעבר",
-    years: "1955–הווה",
-    imageUrl: "https://i.postimg.cc/43vqLk0C/1770564301501.png",
-    etymology: [
-        { label: "עלי", content: "השם הפרטי הערבי שפירושו 'נעלה' או 'גבוה'. בשיעה הוא מסמל את הקשר לאימאם עלי וערכי הגבורה והצדק ששמח'אני מקרין כמנהיג צבאי בכיר." },
-        { label: "שמח'אני", content: "שם משפחה המזוהה עם השבטים הערביים במחוז ח'וזסתאן שבדרום-מערב איראן. השם מרמז על מוצא אתני ערבי-איראני ועל שושלת מכובדת בקרב המיעוט הערבי הנאמן למהפכה." }
-    ],
-    earlyLife: {
-        background: "נולד באהואז שבמחוז ח'וזסתאן למשפחה ערבית-איראנית. בצעירותו היה פעיל בתנועות אסלאמיות רדיקליות שנאבקו בשלטון השאה באזורי הפריפריה הדרומיים של איראן.",
-        family: "משפחתו שילבה נאמנות דתית עם זהות שבטית ערבית חזקה. במהלך מלחמת איראן-עיראק איבד שלושה מאחיו בקרבות, מה שחיזק את מעמדו כבן למשפחת שכול (שהידים) מוערכת ביותר בממסד.",
-        education: "בעל תואר בהנדסה אסטרטגית וניהול. שירת בדרגות פיקוד בכירות ביותר בחיל הים ובמשמרות המהפכה, והיה דמות מפתח בהקמת הכוח הימי המודרני של הרפובליקה האסלאמית."
-    },
-    clothing: [
-        { item: "מדי אדמירל לבנים", content: "שמח'אני הוא מהמנהיגים הבודדים המופיעים במדי חיל הים הלבנים והמפוארים. הדרגות המוזהבות והמדים המגוהצים משדרים סמכות צבאית ימית ועוצמה אסטרטגית במפרץ הפרסי." },
-        { item: "חליפת הדיפלומט", content: "בתפקידיו האזרחיים, הוא עבר ללבוש חליפות כהות ומחויטות ללא עניבה, המזוהות עם הדרג המדיני הבכיר. מראה זה משלב בין הלוחם הקשוח לאסטרטג המתוחכם המנהל משא ומתן אזורי." },
-        { item: "חזות ה'ביטחוניסט' הערבי", content: "המראה שלו כולל זקן מסודר וחיוך מאופק, משדר ביטחון עצמי של אדם המכיר את המערב ואת העולם הערבי כאחד. חזותו משמשת גשר ויזואלי בין טהראן לבירות ערב." }
-    ],
-    ideology: {
-        core: "ריאליזם ביטחוני ודיפלומטיה אזורית.",
-        details: "שמח'אני מאמין בחיזוק הביטחון הלאומי דרך בריתות אזוריות (במיוחד עם מדינות ערב) לצד הרתעה צבאית חזקה. הוא נחשב למתווך פרגמטי המסוגל לדבר עם יריבים ממרכז הממסד השמרני."
-    },
-    achievements: {
-        list: [
-            "היה האדריכל הראשי של הסכם נרמול היחסים ההיסטורי עם סעודיה ב-2023.",
-            "כיהן כמזכיר המועצה העליונה לביטחון לאומי במשך עשור של משברים בינלאומיים.",
-            "שירת כשר ההגנה תחת הנשיא הרפורמיסט ח'אתמי, מה שמראה על יכולתו לגשר בין פלגים.",
-            "ממקימי חיל הים של משמרות המהפכה (IRGC Navy) ומעצבי דוקטרינת הלחימה הימית."
-        ]
-    },
-    rise: { reason: "נאמנותו המוחלטת למנהיג העליון בשילוב עם יכולתו המוכחת לגשר בין פלגים פוליטיים וזירות בינלאומיות מורכבות.", year: "2013" }
-}
+                    id: 14,
+                    fullName: "עלי שמח'אני",
+                    role: "יועץ בכיר למנהיג העליון ומזכיר המועצה לביטחון לאומי לשעבר",
+                    category: "official", // בכיר משטר
+                    years: "1955–הווה",
+                    imageUrl: "https://i.postimg.cc/43vqLk0C/1770564301501.png",
+                    etymology: [
+                        { label: "עלי", content: "השם הפרטי הערבי שפירושו 'נעלה' או 'גבוה'. בשיעה הוא מסמל את הקשר לאימאם עלי וערכי הגבורה והצדק ששמח'אני מקרין כמנהיג צבאי בכיר." },
+                        { label: "שמח'אני", content: "שם משפחה המזוהה עם השבטים הערביים במחוז ח'וזסתאן שבדרום-מערב איראן. השם מרמז על מוצא אתני ערבי-איראני ועל שושלת מכובדת בקרב המיעוט הערבי הנאמן למהפכה." }
+                    ],
+                    earlyLife: {
+                        background: "נולד באהואז שבמחוז ח'וזסתאן למשפחה ערבית-איראנית. בצעירותו היה פעיל בתנועות אסלאמיות רדיקליות שנאבקו בשלטון השאה באזורי הפריפריה הדרומיים של איראן.",
+                        family: "משפחתו שילבה נאמנות דתית עם זהות שבטית ערבית חזקה. במהלך מלחמת איראן-עיראק איבד שלושה מאחיו בקרבות, מה שחיזק את מעמדו כבן למשפחת שכול (שהידים) מוערכת ביותר בממסד.",
+                        education: "בעל תואר בהנדסה אסטרטגית וניהול. שירת בדרגות פיקוד בכירות ביותר בחיל הים ובמשמרות המהפכה, והיה דמות מפתח בהקמת הכוח הימי המודרני של הרפובליקה האסלאמית."
+                    },
+                    clothing: [
+                        { item: "מדי אדמירל לבנים", content: "שמח'אני הוא מהמנהיגים הבודדים המופיעים במדי חיל הים הלבנים והמפוארים. הדרגות המוזהבות והמדים המגוהצים משדרים סמכות צבאית ימית ועוצמה אסטרטגית במפרץ הפרסי." },
+                        { item: "חליפת הדיפלומט", content: "בתפקידיו האזרחיים, הוא עבר ללבוש חליפות כהות ומחויטות ללא עניבה, המזוהות עם הדרג המדיני הבכיר. מראה זה משלב בין הלוחם הקשוח לאסטרטג המתוחכם המנהל משא ומתן אזורי." },
+                        { item: "חזות ה'ביטחוניסט' הערבי", content: "המראה שלו כולל זקן מסודר וחיוך מאופק, משדר ביטחון עצמי של אדם המכיר את המערב ואת העולם הערבי כאחד. חזותו משמשת גשר ויזואלי בין טהראן לבירות ערב." }
+                    ],
+                    ideology: {
+                        core: "ריאליזם ביטחוני ודיפלומטיה אזורית.",
+                        details: "שמח'אני מאמין בחיזוק הביטחון הלאומי דרך בריתות אזוריות (במיוחד עם מדינות ערב) לצד הרתעה צבאית חזקה. הוא נחשב למתווך פרגמטי המסוגל לדבר עם יריבים ממרכז הממסד השמרני."
+                    },
+                    achievements: {
+                        list: [
+                            "היה האדריכל הראשי של הסכם נרמול היחסים ההיסטורי עם סעודיה ב-2023.",
+                            "כיהן כמזכיר המועצה העליונה לביטחון לאומי במשך עשור של משברים בינלאומיים.",
+                            "שירת כשר ההגנה תחת הנשיא הרפורמיסט ח'אתמי, מה שמראה על יכולתו לגשר בין פלגים.",
+                            "ממקימי חיל הים של משמרות המהפכה (IRGC Navy) ומעצבי דוקטרינת הלחימה הימית."
+                        ]
+                    },
+                    rise: { reason: "נאמנותו המוחלטת למנהיג העליון בשילוב עם יכולתו המוכחת לגשר בין פלגים פוליטיים וזירות בינלאומיות מורכבות.", year: "2013" }
+                }
             ], []);
 
+            // מסנן את המנהיגים גם לפי העמוד הפעיל (הטאב הנוכחי) וגם לפי חיפוש
             const filteredLeaders = leaders.filter(l => 
-                l.fullName.includes(searchTerm) || l.role.includes(searchTerm)
+                (l.fullName.includes(searchTerm) || l.role.includes(searchTerm)) &&
+                l.category === activePage
+            );
+
+            const renderLeaderCard = (leader) => (
+                <div 
+                    key={leader.id}
+                    className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-6 shadow-xl relative overflow-hidden group flex flex-col cursor-pointer hover:border-amber-500/30 transition-all"
+                >
+                    <div className="absolute top-0 left-0 w-2 h-full bg-amber-600/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="flex gap-5 items-start">
+                        <div 
+                            className="w-28 h-28 bg-slate-800 rounded-[2rem] flex-shrink-0 overflow-hidden border border-slate-700 shadow-inner relative z-10"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEnlargedImage(leader.imageUrl);
+                            }}
+                        >
+                            <img 
+                                src={leader.imageUrl} 
+                                alt={leader.fullName} 
+                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-110"
+                                loading="lazy"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
+                                <Icon name="maximize-2" className="text-white w-6 h-6" />
+                            </div>
+                        </div>
+                        <div className="flex-1 min-w-0 pt-1" onClick={() => setSelectedLeader(leader)}>
+                            <h2 className="text-xl font-bold text-slate-50 truncate leading-tight group-hover:text-amber-500 transition-colors">{leader.fullName}</h2>
+                            <span className="text-[11px] font-black bg-amber-900/30 text-amber-400 px-3 py-1 rounded-full mb-3 inline-block italic border border-amber-900/40 mt-2">{leader.years}</span>
+                            <p className="text-amber-600 text-[11px] font-bold uppercase tracking-widest truncate">{leader.role}</p>
+                        </div>
+                    </div>
+                    <div className="mt-5 pt-5 border-t border-slate-800/50" onClick={() => setSelectedLeader(leader)}>
+                        <p className="text-slate-400 text-xs line-clamp-3 leading-relaxed font-medium">{leader.earlyLife.background}</p>
+                        <div className="mt-5 flex items-center text-amber-500 text-[12px] font-black uppercase tracking-tighter">
+                            קרא את המחקר המלא <Icon name="chevron-left" className="w-4 h-4 mr-1" />
+                        </div>
+                    </div>
+                </div>
             );
 
             return (
-                <div className="min-h-screen bg-slate-950 text-slate-100 p-4 font-sans select-none overflow-x-hidden">
+                <div className="min-h-screen bg-slate-950 text-slate-100 p-4 font-sans select-none overflow-x-hidden pb-24">
                     <header className="max-w-4xl mx-auto py-8 text-center">
                         <div className="bg-amber-500/20 p-4 rounded-3xl inline-block mb-4 border border-amber-500/30 shadow-2xl">
                             <Icon name="book-open" className="text-amber-500 w-10 h-10" />
                         </div>
                         <h1 className="text-3xl font-black text-amber-500 mb-2 tracking-tight uppercase">אנציקלופדיית מנהיגי איראן</h1>
-                        <p className="text-slate-400 text-sm max-w-md mx-auto italic font-medium">מחקר ביוגרפי, אידיאולוגי, אטימולוגי ולבוש מורחב ומפורט</p>
+                        <p className="text-slate-400 text-sm max-w-md mx-auto italic font-medium">מחקר ביוגרפי, אידיאולוגי, אטימולוגי ולבוש מורחב</p>
                         
                         <div className="relative group mt-8 max-w-md mx-auto px-2">
                             <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-amber-500">
@@ -588,44 +645,54 @@
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
+
+                        {/* מערכת הניווט (טאבים) להפרדת העמודים */}
+                        <div className="flex justify-center mt-10 mb-2 gap-3 sm:gap-4 bg-slate-900 p-2.5 rounded-full border border-slate-800 shadow-xl max-w-md mx-auto">
+                            <button
+                                onClick={() => setActivePage('state')}
+                                className={`flex-1 py-3.5 px-4 sm:px-6 rounded-full font-black text-sm transition-all flex items-center justify-center gap-2 ${activePage === 'state' ? 'bg-amber-500 text-slate-950 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}
+                            >
+                                <Icon name="crown" className="w-5 h-5" />
+                                מנהיגי מדינה
+                            </button>
+                            <button
+                                onClick={() => setActivePage('official')}
+                                className={`flex-1 py-3.5 px-4 sm:px-6 rounded-full font-black text-sm transition-all flex items-center justify-center gap-2 ${activePage === 'official' ? 'bg-amber-500 text-slate-950 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}
+                            >
+                                <Icon name="shield-alert" className="w-5 h-5" />
+                                בכירי מערכת
+                            </button>
+                        </div>
                     </header>
 
-                    <main className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 pb-24">
-                        {filteredLeaders.map((leader) => (
-                            <div 
-                                key={leader.id}
-                                className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-6 shadow-xl relative overflow-hidden group flex flex-col"
-                            >
-                                <div className="absolute top-0 left-0 w-2 h-full bg-amber-600/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                <div className="flex gap-5 items-start">
-                                    <div 
-                                        className="w-28 h-28 bg-slate-800 rounded-[2rem] flex-shrink-0 overflow-hidden border border-slate-700 shadow-inner relative cursor-zoom-in"
-                                        onClick={() => setEnlargedImage(leader.imageUrl)}
-                                    >
-                                        <img 
-                                            src={leader.imageUrl} 
-                                            alt={leader.fullName} 
-                                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                                            loading="lazy"
-                                        />
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Icon name="maximize-2" className="text-white w-6 h-6" />
-                                        </div>
-                                    </div>
-                                    <div className="flex-1 min-w-0 pt-1" onClick={() => setSelectedLeader(leader)}>
-                                        <h2 className="text-xl font-bold text-slate-50 truncate leading-tight cursor-pointer hover:text-amber-500 transition-colors">{leader.fullName}</h2>
-                                        <span className="text-[11px] font-black bg-amber-900/30 text-amber-400 px-3 py-1 rounded-full mb-3 inline-block italic border border-amber-900/40 mt-2">{leader.years}</span>
-                                        <p className="text-amber-600 text-[11px] font-bold uppercase tracking-widest truncate">{leader.role}</p>
-                                    </div>
-                                </div>
-                                <div className="mt-5 pt-5 border-t border-slate-800/50 cursor-pointer" onClick={() => setSelectedLeader(leader)}>
-                                    <p className="text-slate-400 text-xs line-clamp-3 leading-relaxed font-medium">{leader.earlyLife.background}</p>
-                                    <div className="mt-5 flex items-center text-amber-500 text-[12px] font-black uppercase tracking-tighter">
-                                        קרא את המחקר המלא <Icon name="chevron-left" className="w-4 h-4 mr-1" />
-                                    </div>
-                                </div>
+                    <main className="max-w-4xl mx-auto space-y-10">
+                        {/* כותרת מתחלפת בהתאם לעמוד */}
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-lg">
+                                <Icon name={activePage === 'state' ? 'crown' : 'shield-alert'} className="text-amber-500 w-6 h-6" />
                             </div>
-                        ))}
+                            <div>
+                                <h2 className="text-2xl font-black text-slate-100 uppercase tracking-tight">
+                                    {activePage === 'state' ? 'מנהיגי המדינה' : 'בכירי המערכת'}
+                                </h2>
+                                <p className="text-amber-600 text-[11px] font-bold tracking-widest">
+                                    {activePage === 'state' ? 'הדרג העליון: מנהיגים רוחניים, מלכים ונשיאים' : 'דיפלומטים, גנרלים ומעצבי מדיניות'}
+                                </p>
+                            </div>
+                            <div className="flex-1 h-px bg-gradient-to-l from-slate-800 to-transparent ml-4"></div>
+                        </div>
+
+                        {/* רינדור הרשימה בהתאם לטאב הפעיל בלבד */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-500">
+                            {filteredLeaders.map(renderLeaderCard)}
+                        </div>
+
+                        {filteredLeaders.length === 0 && (
+                            <div className="text-center py-20">
+                                <Icon name="search-x" className="w-16 h-16 text-slate-700 mx-auto mb-4" />
+                                <p className="text-slate-500 font-medium">לא נמצאו תוצאות לחיפוש "{searchTerm}" בעמוד זה</p>
+                            </div>
+                        )}
                     </main>
 
                     {selectedLeader && (
@@ -635,20 +702,20 @@
                                 <div className="p-8 border-b border-slate-800 flex justify-between items-center bg-slate-900">
                                     <div className="flex items-center gap-6">
                                         <div 
-                                            className="w-24 h-24 bg-slate-800 rounded-[2.5rem] overflow-hidden border border-slate-700 shadow-2xl cursor-zoom-in group"
+                                            className="w-24 h-24 bg-slate-800 rounded-[2.5rem] overflow-hidden border border-slate-700 shadow-2xl cursor-zoom-in group shrink-0"
                                             onClick={(e) => { e.stopPropagation(); setEnlargedImage(selectedLeader.imageUrl); }}
                                         >
-                                            <img src={selectedLeader.imageUrl} className="w-full h-full object-cover" />
+                                            <img src={selectedLeader.imageUrl} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                                         </div>
                                         <div>
-                                            <h2 className="text-2xl font-black text-amber-500 leading-tight">{selectedLeader.fullName}</h2>
-                                            <p className="text-xs text-slate-500 font-bold uppercase mt-1 tracking-widest">{selectedLeader.role}</p>
+                                            <h2 className="text-xl sm:text-2xl font-black text-amber-500 leading-tight">{selectedLeader.fullName}</h2>
+                                            <p className="text-[11px] sm:text-xs text-slate-500 font-bold uppercase mt-1 tracking-widest">{selectedLeader.role}</p>
                                         </div>
                                     </div>
-                                    <button onClick={() => setSelectedLeader(null)} className="bg-slate-800 p-4 rounded-full text-slate-400 hover:text-white shadow-2xl active:scale-90"><Icon name="x" className="w-6 h-6" /></button>
+                                    <button onClick={() => setSelectedLeader(null)} className="bg-slate-800 p-4 rounded-full text-slate-400 hover:text-white shadow-2xl active:scale-90 shrink-0 ml-2"><Icon name="x" className="w-6 h-6" /></button>
                                 </div>
                                 
-                                <div className="p-10 space-y-10">
+                                <div className="p-8 sm:p-10 space-y-10">
                                     <div className="grid grid-cols-3 gap-4">
                                         <div className="bg-slate-800/40 p-5 rounded-[2rem] border border-slate-800 text-center shadow-inner">
                                             <Icon name="history" className="text-amber-500 w-6 h-6 mx-auto mb-2" /><div className="text-[10px] text-slate-500 font-bold uppercase">שנת עלייה</div><div className="text-sm text-white font-black">{selectedLeader.rise.year}</div>
@@ -666,7 +733,7 @@
                                         <h3 className="text-amber-500 font-black text-sm mb-6 flex items-center uppercase tracking-widest border-r-4 border-amber-600 pr-4">
                                             ניתוח אטימולוגי של השם המלא
                                         </h3>
-                                        <div className="bg-slate-800/20 p-8 rounded-[2.5rem] border border-slate-800 space-y-8 shadow-inner">
+                                        <div className="bg-slate-800/20 p-6 sm:p-8 rounded-[2.5rem] border border-slate-800 space-y-8 shadow-inner">
                                             {selectedLeader.etymology.map((item, index) => (
                                                 <div key={index} className="flex gap-4">
                                                     <div className="etymology-number">{index + 1}</div>
@@ -686,16 +753,16 @@
                                         <h3 className="text-slate-300 font-black text-sm mb-6 flex items-center uppercase tracking-widest border-r-4 border-slate-600 pr-4">
                                             ילדות, משפחה וחינוך מוקדם
                                         </h3>
-                                        <div className="space-y-8">
-                                            <div className="p-8 bg-slate-800/20 rounded-[2rem] border border-slate-800/50 shadow-inner">
+                                        <div className="space-y-6 sm:space-y-8">
+                                            <div className="p-6 sm:p-8 bg-slate-800/20 rounded-[2rem] border border-slate-800/50 shadow-inner">
                                                 <h4 className="text-amber-500/80 text-[11px] font-bold uppercase mb-4 tracking-[0.2em] italic underline decoration-amber-500/10">רקע משפחתי ונסיבות לידה</h4>
                                                 <p className="content-paragraph text-slate-300 font-light">{selectedLeader.earlyLife.background}</p>
                                             </div>
-                                            <div className="p-8 bg-slate-800/20 rounded-[2rem] border border-slate-800/50 shadow-inner">
+                                            <div className="p-6 sm:p-8 bg-slate-800/20 rounded-[2rem] border border-slate-800/50 shadow-inner">
                                                 <h4 className="text-amber-500/80 text-[11px] font-bold uppercase mb-4 tracking-[0.2em] italic underline decoration-amber-500/10">דמויות משפיעות והקשר משפחתי</h4>
                                                 <p className="content-paragraph text-slate-300 font-light">{selectedLeader.earlyLife.family || selectedLeader.earlyLife.mother}</p>
                                             </div>
-                                            <div className="p-8 bg-slate-800/20 rounded-[2rem] border border-slate-800/50 shadow-inner">
+                                            <div className="p-6 sm:p-8 bg-slate-800/20 rounded-[2rem] border border-slate-800/50 shadow-inner">
                                                 <h4 className="text-amber-500/80 text-[11px] font-bold uppercase mb-4 tracking-[0.2em] italic underline decoration-amber-500/10">מסלול השכלה והכשרה אקדמית</h4>
                                                 <p className="content-paragraph text-slate-300 font-light">{selectedLeader.earlyLife.education}</p>
                                             </div>
@@ -704,12 +771,12 @@
 
                                     <div className="section-divider"></div>
 
-                                    {/* 3. Clothing Section - Detailed & Split */}
+                                    {/* 3. Clothing Section */}
                                     <section>
                                         <h3 className="text-amber-500 font-black text-sm mb-6 flex items-center uppercase tracking-widest border-r-4 border-amber-600 pr-4">
-                                            ניתוח לבוש וסממני הופעה (עם תרגום לעברית)
+                                            ניתוח לבוש וסממני הופעה
                                         </h3>
-                                        <div className="bg-slate-800/40 p-8 rounded-[3rem] border border-slate-800 shadow-xl space-y-10">
+                                        <div className="bg-slate-800/40 p-6 sm:p-8 rounded-[3rem] border border-slate-800 shadow-xl space-y-10">
                                             {selectedLeader.clothing.map((cloth, idx) => (
                                                 <div key={idx} className="space-y-4 border-b border-slate-700/50 pb-8 last:border-b-0">
                                                     <div className="flex items-center gap-3">
@@ -731,7 +798,7 @@
                                         <h3 className="text-slate-300 font-black text-sm mb-6 flex items-center uppercase tracking-widest border-r-4 border-slate-600 pr-4">
                                             תפיסה אידיאולוגית ופוליטית
                                         </h3>
-                                        <div className="bg-slate-800/30 p-10 rounded-[3rem] border-l-4 border-amber-500 shadow-inner">
+                                        <div className="bg-slate-800/30 p-8 sm:p-10 rounded-[3rem] border-l-4 border-amber-500 shadow-inner">
                                             <p className="text-amber-500 font-bold text-lg mb-6 underline decoration-amber-500/30 tracking-tight">{selectedLeader.ideology.core}</p>
                                             <p className="content-paragraph text-slate-200 italic leading-relaxed font-light">{selectedLeader.ideology.details}</p>
                                         </div>
@@ -752,7 +819,7 @@
                                                 </li>
                                             ))}
                                         </ul>
-                                        <div className="mt-12 p-8 bg-slate-800/40 rounded-[2.5rem] border border-slate-800 text-[12px] text-slate-500 italic shadow-inner">
+                                        <div className="mt-12 p-6 sm:p-8 bg-slate-800/40 rounded-[2.5rem] border border-slate-800 text-[12px] text-slate-500 italic shadow-inner">
                                             <span className="font-bold text-slate-400 not-italic uppercase tracking-widest ml-1">נסיבות עלייה לתפקיד:</span> 
                                             {selectedLeader.rise.reason}
                                         </div>
