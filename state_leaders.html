@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מנהיגי מדינה - מרכז המחקר</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React and ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: #020617; /* slate-950 */
+            color: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        const App = () => {
+            const [selectedLeader, setSelectedLeader] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+
+            useEffect(() => {
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+            }, [selectedLeader, searchTerm]);
+
+            const leaders = useMemo(() => [
+                {
+                    id: 1,
+                    fullName: "סייד רוחאללה מוסאווי ח'ומייני",
+                    role: "מייסד המהפכה האסלאמית והמנהיג העליון הראשון",
+                    years: "1902–1989",
+                    imageUrl: "https://i.postimg.cc/zLrpCKBF/1770134682965.png",
+                    etymology: [
+                        { label: "סייד", content: "תואר כבוד דתי המוענק לצאצאים ישירים של הנביא מוחמד. המעמד מקנה יוקרה חברתית ורוחנית עצומה בקרב המאמינים השיעים." },
+                        { label: "רוחאללה", content: "שם שמשמעותו המילולית היא 'רוח האל'. בקרב השיעה האיראנית הוא ניתן לעיתים כביטוי לקדושה פוטנציאלית." },
+                        { label: "מוסאווי", content: "שם ייחוס המעיד על השתייכות לשושלת המכובדת של האימאם השביעי בשיעה, מוסא אל-כאז'ם." },
+                        { label: "ח'ומייני", content: "שם משפחה גאוגרפי המציין את מוצאו מהעיר ח'ומיין שבמרכז איראן. אומץ רשמית בשנות ה-20." }
+                    ],
+                    earlyLife: {
+                        background: "נולד בח'ומיין למשפחת חכמי דת בולטים. אביו נרצח במארב אלים כשהיה רוחאללה בן חמישה חודשים בלבד, מה שהניח את היסודות לבוז העמוק שרחש לבעלי השררה.",
+                        family: "גודל על ידי אמו האג'ר ודודתו סהיבה. האובדן הכפול של שתי הדמויות הללו כשהיה בן 15 הותיר אותו יתום ועיצב את אישיותו כנזיר מתבודד.",
+                        education: "החל לימודיו בסמינר דתי באראק ועבר לקום ב-1922. גילה עניין עמוק ב'אירפאן' (מיסטיקה אסלאמית) ובפילוסופיה קלאסית."
+                    },
+                    clothing: [
+                        { item: "העמאמה (Amama) - הטורבן השחור", content: "חבש את הטורבן השחור המציין את היותו 'סייד'. ליפוף רחב ומסיבי ששידר יציבות ונוכחות פיזית מרשימה." },
+                        { item: "העבאא (Aba) - גלימת הסגפנות", content: "עשויה מצמר כבשים פשוט, ללא עיטורים, מסמלת את ה'זוהד' (סגפנות) מול הראוותנות המערבית." }
+                    ],
+                    ideology: { core: "ולאית-י פקיה (שלטון חכם ההלכה)", details: "תפיסה מהפכנית הטוענת כי בתקופת ההסתרה, הסמכות הפוליטית המוחלטת חייבת להימצא בידי חכם הדת הצודק והמיומן ביותר." },
+                    achievements: { list: ["הובלת המהפכה האסלאמית ב-1979", "ייסוד הרפובליקה האסלאמית", "ניהול המדינה במהלך מלחמת איראן-עיראק", "הפיכת האסלאם הפוליטי לכוח גלובלי"] },
+                    rise: { reason: "כריזמה רוחנית בלתי מתפשרת וזיהויו כמגן העניים.", year: "1979" }
+                },
+                {
+                    id: 2,
+                    fullName: "סייד עלי חוסייני ח'אמנאי",
+                    role: "המנהיג העליון השני של איראן",
+                    years: "1939–הווה",
+                    imageUrl: "https://i.postimg.cc/wtpFXLvc/1770134687898.png",
+                    etymology: [
+                        { label: "סייד", content: "תואר המציין ייחוס לנביא, המקנה לו מעמד של סמכות רוחנית עליונה בעולם השיעי." },
+                        { label: "עלי", content: "על שם האימאם עלי בן אבי-טאלב, מסמל צדק אבסולוטי, גבורה עילאית וחוכמה אלוהית." },
+                        { label: "חוסייני", content: "שם ייחוס המדגיש את הזיקה לאימאם חוסיין וערך ה'עאשורא' - המאבק התמידי של המעטים הצודקים." },
+                        { label: "ח'אמנאי", content: "מציין את מוצא משפחתו מהעיירה ח'אמנה. מסמל את אחדות איראן על פני המגוון האתני." }
+                    ],
+                    earlyLife: {
+                        background: "נולד במשהד כבן שני למשפחת חכמי דת שחיה בעוני קיצוני ומכובד. אביו היה איש דת שמרן וסגפן.",
+                        family: "גדל בבית קטן בעל חדר אחד. אמו טיפחה את אהבתו לשפה ולספרות הפרסית הקלאסית והמודרנית.",
+                        education: "למד במדרשות של משהד ונג'ף. הפך לפעיל פוליטי רדיקלי בהשפעת ח'ומייני ונעצר מספר פעמים על ידי הסאוואכ."
+                    },
+                    clothing: [
+                        { item: "הצ'אפייה (Chafiyeh) - כאפיית המאבק", content: "המנהיג היחיד בצמרת שתמיד מניח על כתפיו את הכאפייה המהפכנית, לסימון סולידריות עם לוחמי הבסיג'." },
+                        { item: "העבאא והמקטורן", content: "מראה של 'איש דת עובד' המשלב מסורת עם ניהול מדינה מודרני ופרקטי." }
+                    ],
+                    ideology: { core: "כלכלת התנגדות וחשדנות כלפי המערב", details: "בניית עוצמה צבאית וטכנולוגית פנימית להפיכת איראן לחסינה מפני סנקציות." },
+                    achievements: { list: ["שימור יציבות המשטר מעל 35 שנה", "הפיכת איראן למעצמה אזורית", "קידום מואץ של תוכנית הגרעין", "פיתוח תעשיית טילים ומל\"טים"] },
+                    rise: { reason: "נבחר על ידי מועצת המומחים בזכות נאמנותו וקשריו עם משמרות המהפכה.", year: "1989" }
+                },
+                {
+                    id: 3,
+                    fullName: "מוחמד רזא פהלווי",
+                    role: "השאה האחרון של איראן",
+                    years: "1919–1980",
+                    imageUrl: "https://i.postimg.cc/3dxyzRyk/1770133509758.png",
+                    etymology: [
+                        { label: "מוחמד", content: "נבחר כדי להעניק לשושלת הצעירה והחילונית לגיטימציה דתית ומוסלמית מסורתית מול ההמונים." },
+                        { label: "רזא", content: "הומאז' לאימאם השמיני עלי א-רזא, נועד לחזק את הקשר של השושלת לקדושה השיעית הלאומית." },
+                        { label: "פהלווי", content: "נגזר מהשפה הפרסית האמצעית, נועד לסמל את הזיקה לאימפריה הסאסאנית המפוארת." }
+                    ],
+                    earlyLife: {
+                        background: "נולד בטהראן כבנו הבכור של רזא ח'אן. גדל בחינוך צבאי נוקשה מאוד תחת פיקוחו של אביו הסמכותי.",
+                        family: "יחסיו עם אביו היו רוויים בהערצה לצד פחד. ראה בעצמו שליח של האל שנועד להוביל את איראן לעידן של קידמה.",
+                        education: "למד בשווייץ בפנימיית 'לה רוזי' היוקרתית, שם ספג רעיונות דמוקרטיה ותרבות אירופית."
+                    },
+                    clothing: [
+                        { item: "מדי השרד (Uniform) הצבאיים", content: "מדים מפוארים המעוטרים בדרגות זהב, סימלו את תפקידו כמפקד העליון ואת עוצמת המדינה." },
+                        { item: "החליפה (Suit) האירופית", content: "הצהרה אידיאולוגית: איראן שייכת לעולם המודרני והמתקדם, בניגוד לממסד הדתי." }
+                    ],
+                    ideology: { core: "מודרניזציה חילונית מואצת", details: "האמין ב'מערביזציה' כדרך היחידה להצלת איראן מהנחשלות, תוך הדגשת מורשת כורש הגדול." },
+                    achievements: { list: ["הובלת 'המהפכה הלבנה'", "בניית תשתית תעשייתית ואקדמית מודרנית", "הפיכת איראן ל'שוטר' המפרץ הפרסי", "קיום חגיגות 2,500 שנה לאימפריה"] },
+                    rise: { reason: "ירושת הכתר לאחר שבעלות הברית אילצו את אביו לוותר על כיסאו.", year: "1941" }
+                },
+                {
+                    id: 4,
+                    fullName: "מוחמד מוסאדק",
+                    role: "ראש הממשלה הלאומני של איראן",
+                    years: "1882–1967",
+                    imageUrl: "https://i.postimg.cc/7fZCj6CC/1770133514666.png",
+                    etymology: [
+                        { label: "מוחמד", content: "שם המסמל חיבור למסורת ולערכי הצדק של האסלאם המוקדם ששולבו עם לאומיות מודרנית." },
+                        { label: "מוסאדק", content: "פירושו 'איש האמת'. הפך לסמל של יושרה חסרת פשרות מול השחיתות והדיכוי המלוכני." }
+                    ],
+                    earlyLife: {
+                        background: "נולד למשפחת אצולה קאג'ארית עשירה. אמו הייתה נסיכה ואביו פקיד בכיר, מה שהעניק לו ביטחון במסדרונות הכוח.",
+                        family: "למרות ייחוסו האציל, פיתח זיקה לזכויות העם וראה בשלטון השאה כלי שרת של האימפריאליזם הבריטי.",
+                        education: "האיראני הראשון שקיבל דוקטורט למשפטים מאירופה. הושפע מערכי הליברליזם והדמוקרטיה המערביים."
+                    },
+                    clothing: [
+                        { item: "הפאי-ג'אמה (Pajamas)", content: "ניהל ישיבות ממשלה ממיטתו בפיג'מה, לשדר שהוא מקדיש את כל כוחותיו הפיזיים למאבק הלאומי." },
+                        { item: "המעיל (Overcoat) הארוך", content: "מראה 'מרושל' במכוון כחלק מהמיתוס שלו כלוחם צדק שאינו דואג למחלצות פאר." }
+                    ],
+                    ideology: { core: "ריבונות לאומית ואנטי-קולוניאליזם", details: "האמין שהלאמת הנפט היא הדרך היחידה להשתחרר מהשעבוד לחברות זרות ולבנות חברה דמוקרטית." },
+                    achievements: { list: ["הלאמת תעשיית הנפט ב-1951", "הקמת 'החזית הלאומית'", "ניהול מאבק משפטי מבריק בהאג", "הפיכה לסמל עולמי של העולם השלישי"] },
+                    rise: { reason: "נבחר בלחץ ציבורי אדיר ותמיכה גורפת בתוכנית ההלאמה שלו.", year: "1951" }
+                },
+                {
+                    id: 6,
+                    fullName: "מחמוד אחמדינז'אד",
+                    role: "נשיא איראן השישי (פופוליסט שמרני)",
+                    years: "1956–הווה",
+                    imageUrl: "https://i.postimg.cc/PP5L0xLm/1770132662034.png",
+                    etymology: [
+                        { label: "מחמוד", content: "פירושו 'המהולל'. שם המקובל בקרב השכבות הדתיות ומסמל אמונה אדוקה במסורת." },
+                        { label: "אחמדינז'אד", content: "שילוב של 'אחמד' ו-'נז'אד' (גזע). משמעותו 'מזרעו של אחמד', לשדר זהות דתית שמרנית." }
+                    ],
+                    earlyLife: {
+                        background: "נולד בכפר קטן למשפחת נפח קשת יום. ילדותו בשכונות העוני של טהראן עיצבה את תפיסתו הפופוליסטית.",
+                        family: "אביו היה דמות סמכותית שהקפידה על חינוך שמרני נוקשה. השכלתו כמהנדס הייתה הכלי שלו למוביליות חברתית.",
+                        education: "דוקטור בתכנון תחבורה. היה פעיל מאוד בארגון סטודנטים אסלאמי קיצוני בתקופת המהפכה."
+                    },
+                    clothing: [
+                        { item: "הקאפשן (Kapshan)", content: "מעיל רוח פשוט שסימל בוז לגינוני טקס והזדהות מוחלטת עם מעמד הפועלים והעניים." },
+                        { item: "חולצת הבסיג' הלבנה", content: "חולצה פשוטה ללא עניבה, נועדה לשדר ניקיון כפיים וטוהר מוסרי מול 'השחיתות של הממסד'." }
+                    ],
+                    ideology: { core: "פופוליזם דתי משיחי", details: "הציג עצמו כלוחם בשחיתות האליטות וכנציג ה'מדוכאים'. הרבה לדבר על בואו הקרוב של המהדי." },
+                    achievements: { list: ["האצה דרמטית של פרויקט הגרעין", "יישום תוכנית הסובסידיות הישירות", "ביצוע פרויקט הדיור הציבורי 'מהר'", "העלאת איראן כגורם מתריס מול המערב"] },
+                    rise: { reason: "תדמית של 'איש עם' פשוט והבטחה להביא את עושר הנפט לכל שולחן.", year: "2005" }
+                },
+                {
+                    id: 7,
+                    fullName: "סייד חסן רוחאני",
+                    role: "נשיא איראן השביעי (מתון-פרגמטי)",
+                    years: "1948–הווה",
+                    imageUrl: "https://i.postimg.cc/F7HfwRfk/1770132675434.png",
+                    etymology: [
+                        { label: "סייד", content: "תואר המקנה לו מעמד דתי בכיר בתוך המערכת הפוליטית והחברתית השמרנית." },
+                        { label: "חסן", content: "פירושו 'טוב' או 'נאה'. מקושר לאימאם חסן וסמל לפיוס במסורת השיעית." },
+                        { label: "רוחאני", content: "פירושו 'רוחני'. שינה את שמו (מפרידון) כדי להדגיש את מחויבותו לזהות הדתית המהפכנית." }
+                    ],
+                    earlyLife: {
+                        background: "נולד בסורח'ה למשפחה שהתנגדה לשאה. החל לימודי דת בגיל צעיר ועבר לקום להמשך לימודים גבוהים.",
+                        family: "משפחתו הייתה חלק מרשת פעילים אסלאמיים. נודע כנואם מוכשר שחיבר בין הקהל המשכיל למסרי המהפכה.",
+                        education: "בעל השכלה כפולה: דרגת 'חוג'ת אל-אסלאם' דתית ודוקטורט במשפטים מסקוטלנד."
+                    },
+                    clothing: [
+                        { item: "העמאמה הלבנה", content: "מציין שהוא איש דת (Mullah) שאינו 'סייד' מצד אביו. שידר מתינות ותבונה דתית שקולה." },
+                        { item: "עבאא מחויטת", content: "בחר בגלימות מבדים יוקרתיים ורכים שסימלו את ה'פרגמטיזם האסלאמי' ואסתטיקה מודרנית." }
+                    ],
+                    ideology: { core: "פרגמטיזם אסלאמי ודיאלוג בונה", details: "האמין שניתן לשמר את עקרונות המהפכה תוך פתיחות מבוקרת לעולם לצורך שיקום הכלכלה." },
+                    achievements: { list: ["אדריכל הסכם הגרעין (JCPOA) ב-2015", "ייצוב זמני של המטבע האיראני", "קידום 'אמנת זכויות האזרח'", "שיפור היחסים עם מדינות אירופה"] },
+                    rise: { reason: "הבטיח 'מפתח' (Kelid) לפתרון בעיות המדינה וזכה לתמיכת הצעירים.", year: "2013" }
+                },
+                {
+                    id: 10,
+                    fullName: "סייד מוחמד ח'אתמי",
+                    role: "נשיא איראן החמישי (רפורמיסט)",
+                    years: "1943–הווה",
+                    imageUrl: "https://i.postimg.cc/bswG4JG2/1770132667045.png",
+                    etymology: [
+                        { label: "סייד", content: "תואר המקנה לו סמכות דתית ומוסרית חזקה בתוך הממסד המהפכני והעם המשכיל." },
+                        { label: "מוחמד", content: "מקשר אותו לערכים הרוחניים והמוסריים של ראשית ימי הדת באור תרבותי ומודרני." },
+                        { label: "ח'אתמי", content: "נגזר מהשורש 'ח'תם' (חותם). מעיד על מעמד דתי משפחתי גבוה וחיבור למסורת פילוסופית." }
+                    ],
+                    earlyLife: {
+                        background: "נולד בארדכאן למשפחה דתית אריסטוקרטית. אביו היה אייתוללה בולט וחבר קרוב של ח'ומייני.",
+                        family: "גדל בסביבה שעודדה קריאה של ספרות עולמית ופילוסופיה אירופית, דבר שהיה נדיר ביותר אז.",
+                        education: "למד פילוסופיה באיספהאן וניהל את המרכז האסלאמי בהמבורג, שם נחשף לערכים ליברליים מערביים."
+                    },
+                    clothing: [
+                        { item: "העמאמה המוקפדת", content: "טורבן שחור מלופף בצורה נקייה להפליא, ששידר אלגנטיות מאופקת שזכתה להערכה במערב." },
+                        { item: "העבאא הצבעונית", content: "בניגוד לשחור הקלאסי, לבש גלימות בגווני אפור או ירוק זית, שסימלו את 'האביב האיראני'." }
+                    ],
+                    ideology: { core: "דמוקרטיה אסלאמית ודיאלוג בין תרבויות", details: "הציע רפורמה פנימית עמוקה שתאפשר חברה אזרחית, פלורליזם רעיוני וזכויות אזרח בתוך המסגרת האסלאמית." },
+                    achievements: { list: ["הובלת תקופת פריחה תרבותית ועיתונאית", "שיפור דרמטי ביחסי איראן עם אירופה", "העלאת המודעות לזכויות נשים וצעירים", "מניעת עימותים צבאיים פוטנציאליים"] },
+                    rise: { reason: "ניצחון סוחף ב-1997 בתמיכת צעירים ונשים שדרשו שינוי חברתי ופתיחות פוליטית.", year: "1997" }
+                },
+                {
+                    id: 11,
+                    fullName: "מסעוד פזשכיאן",
+                    role: "נשיא איראן הנוכחי",
+                    years: "1954–הווה",
+                    imageUrl: "https://i.postimg.cc/XGzVhwr6/1770134866755.png",
+                    etymology: [
+                        { label: "מסעוד", content: "פירושו 'מאושר' או 'בעל מזל', שם המציין תקווה להצלחה ושגשוג בחברה המורכבת." },
+                        { label: "פזשכיאן", content: "נגזר מהמילה הפרסית 'פזשכ' (רופא). המשמעות היא 'משפחת הרופאים', המעיד על הזהות המקצועית שלו." }
+                    ],
+                    earlyLife: {
+                        background: "נולד במהאבאד לאב אזרי ולאם כורדית, עובדה שהפכה אותו לסמל של אחדות אתנית ורב-תרבותיות.",
+                        family: "לאחר שאיבד את אשתו וילדו בתאונה ב-1994, בחר שלא להינשא שוב והקדיש עצמו לשירות הציבור כרופא.",
+                        education: "מנתח לב מהשורה הראשונה. שירת כחובש ורופא קרבי במלחמת איראן-עיראק תחת תנאים קשים בחזית."
+                    },
+                    clothing: [
+                        { item: "הז'קט (Jacket) העממי", content: "מקטורן פשוט ללא חליפה ועניבה, משדר 'איש עבודה' ופשטות של רופא המשרת את הציבור." },
+                        { item: "צווארון פתוח ונעלי הליכה", content: "רמז ויזואלי לרצון שלו להקל על הכפייה החברתית ולייצר פתיחות חדשה ודיאלוג." }
+                    ],
+                    ideology: { core: "רפורמיזם זהיר ואחדות לאומית", details: "דוגל בצדק חברתי, שקיפות שלטונית ושיפור הכלכלה דרך דיאלוג מבוקר עם העולם." },
+                    achievements: { list: ["החזרת המחנה הרפורמיסטי למוקדי השלטון", "מינוי קבינט מגוון הכולל נשים ומיעוטים", "הורדת המתח הפנימי לאחר גלי המחאות", "חתירה לדיאלוג בינלאומי להסרת סנקציות"] },
+                    rise: { reason: "ניצחון מפתיע ב-2024 כקול של שפיות ותקווה לשינוי הדרגתי במערכת האסלאמית.", year: "2024" }
+                },
+                {
+                    id: 12,
+                    fullName: "סייד אבראהים ראיסי",
+                    role: "נשיא איראן השמיני (המנוח)",
+                    years: "1960–2024",
+                    imageUrl: "https://i.postimg.cc/JtqDTJhN/1770132690656.png",
+                    etymology: [
+                        { label: "סייד", content: "מעיד על מעמדו המיוחס בליבה השמרנית והמחויבות העמוקה למסורת הישנה של קום ומשהד." },
+                        { label: "אבראהים", content: "סמל לאמונה עיוורת וצייתנות מוחלטת לרצון האל ולסמכות הדתית העליונה ביותר." },
+                        { label: "ראיסי", content: "נגזר מהמילה 'ראיס' (נשיא). שם שחזה את מסלול חייו הפוליטי המהיר בלב הממסד השמרני." }
+                    ],
+                    earlyLife: {
+                        background: "נולד במשהד. התייתם מאביו בגיל חמש וגדל בסביבה דתית מחמירה שעיצבה את אופיו הנוקשה והממושמע.",
+                        family: "נשא לאישה את בתו של האייתוללה השמרן קיצוני אלם אל-הודא המקורב מאוד למנהיג העליון.",
+                        education: "החל לימודי דת בגיל 15. מונה לתובע בגיל 20 ומזוהה עם המערכת המשפטית המהפכנית הקשוחה."
+                    },
+                    clothing: [
+                        { item: "העמאמה השחורה השמרנית", content: "טורבן פשוט ונטול הוד אסתטי, המבטא נאמנות לקו הסגפני ביותר של עיר הקודש קום." },
+                        { item: "העבאא והנאליין", content: "גלימות כהות וסנדלים פשוטים (Na'lin) שנועדו להקרין פשטות וקרבה לעם השמרני והעני." }
+                    ],
+                    ideology: { core: "שמרנות דתית-משפטית טוטאלית", details: "האמין בחיזוק הריבונות דרך פנייה למזרח (רוסיה וסין) ובאכיפה מחמירה של חוקי המוסר הדתיים." },
+                    achievements: { list: ["הכנסת איראן לארגון שנחאי ו-BRICS", "חיזוק השליטה השמרנית בכל מוסדות המדינה", "יישום מדיניות 'פנייה מזרחה'", "ביצור מנגנוני הביטחון בחברה האיראנית"] },
+                    rise: { reason: "זכה בבחירות 2021 שבהן נפסלו מרבית יריביו הפוטנציאליים על ידי מועצת שומרי החוקה.", year: "2021" }
+                }
+            ], []);
+
+            const filteredLeaders = leaders.filter(l => 
+                l.fullName.includes(searchTerm) || l.role.includes(searchTerm)
+            );
+
+            return (
+                <div className="min-h-screen flex flex-col bg-slate-950">
+                    
+                    {/* Navigation bar - matching Index style */}
+                    <nav className="border-b border-slate-800 bg-slate-900">
+                        <div className="max-w-4xl mx-auto px-4">
+                            <div className="flex items-center h-16 gap-3">
+                                <a href="index.html" className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold bg-slate-800 text-slate-300 hover:bg-blue-600 hover:text-white transition-all shadow-lg active:scale-95">
+                                    <i data-lucide="home" className="w-4 h-4"></i>
+                                    <span>ראשי</span>
+                                </a>
+                                <div className="h-6 w-px bg-slate-800"></div>
+                                <div className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold bg-blue-600 text-white shadow-lg shadow-blue-900/40">
+                                    <i data-lucide="shield-check" className="w-4 h-4"></i>
+                                    <span>מנהיגי מדינה</span>
+                                </div>
+                                <a href="system_officials.html" className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold text-slate-400 border border-transparent hover:bg-slate-800 hover:text-white transition-all active:scale-95">
+                                    <i data-lucide="user-check" className="w-4 h-4"></i>
+                                    <span className="whitespace-nowrap">בכירי מדינה</span>
+                                </a>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <main className="flex-grow max-w-4xl mx-auto px-6 py-12 md:py-20 space-y-12 animate-fade-in">
+                        
+                        <header className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="p-4 bg-blue-500/10 rounded-2xl border border-blue-500/20">
+                                    <i data-lucide="shield-check" className="w-10 h-10 text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white">מנהיגי מדינה</h1>
+                                    <p className="text-blue-500 font-medium text-lg">מחקר ביוגרפי, אידיאולוגי ואטימולוגי מורחב</p>
+                                </div>
+                            </div>
+                            
+                            <div className="relative group max-w-md">
+                                <i data-lucide="search" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                                <input 
+                                    type="text" 
+                                    placeholder="חיפוש מנהיג..."
+                                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 pr-12 pl-4 text-sm focus:outline-none focus:border-blue-500/50 transition-all shadow-inner"
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                        </header>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {filteredLeaders.map(leader => (
+                                <div 
+                                    key={leader.id}
+                                    onClick={() => setSelectedLeader(leader)}
+                                    className="bg-slate-900/40 border border-slate-800 rounded-[2.5rem] p-6 flex gap-6 cursor-pointer hover:border-blue-500/30 transition-all group relative overflow-hidden active:scale-[0.98]"
+                                >
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full translate-x-12 -translate-y-12 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <div className="w-24 h-24 rounded-3xl overflow-hidden border border-slate-800 shrink-0 bg-slate-800">
+                                        <img src={leader.imageUrl} alt={leader.fullName} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                    </div>
+                                    <div className="flex flex-col justify-center min-w-0">
+                                        <h2 className="text-lg font-bold text-white truncate group-hover:text-blue-400 transition-colors">{leader.fullName}</h2>
+                                        <p className="text-blue-500 text-xs font-bold uppercase tracking-wider mt-1">{leader.years}</p>
+                                        <p className="text-slate-500 text-[11px] mt-2 line-clamp-2 leading-relaxed">{leader.role}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </main>
+
+                    {/* Detailed Modal - Fixed Header Issue Solved */}
+                    {selectedLeader && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6">
+                            <div className="absolute inset-0 bg-slate-950/98 backdrop-blur-xl" onClick={() => setSelectedLeader(null)}></div>
+                            <div className="relative w-full max-w-3xl bg-slate-900 md:rounded-[3rem] h-full md:h-auto md:max-h-[92vh] overflow-y-auto no-scrollbar border border-slate-800 shadow-2xl animate-fade-in">
+                                
+                                {/* Modal Header - NON STICKY according to user request */}
+                                <div className="bg-slate-900 p-6 border-b border-slate-800 flex justify-between items-center">
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-16 h-16 rounded-2xl overflow-hidden border border-slate-700 bg-slate-800">
+                                            <img src={selectedLeader.imageUrl} className="w-full h-full object-cover" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-black text-blue-400 tracking-tight">{selectedLeader.fullName}</h2>
+                                            <p className="text-xs text-slate-500 font-bold uppercase tracking-[0.2em]">{selectedLeader.years}</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setSelectedLeader(null)} className="p-4 bg-slate-800 rounded-full hover:bg-blue-600 text-white transition-all shadow-lg active:scale-90">
+                                        <i data-lucide="x" className="w-6 h-6"></i>
+                                    </button>
+                                </div>
+
+                                <div className="p-8 md:p-12 space-y-16">
+                                    {/* Etymology Section */}
+                                    <section className="space-y-8">
+                                        <h3 className="text-blue-400 font-black text-sm uppercase tracking-widest border-r-4 border-blue-600 pr-5">ניתוח אטימולוגי של השם המלא</h3>
+                                        <div className="grid gap-6">
+                                            {selectedLeader.etymology.map((et, i) => (
+                                                <div key={i} className="p-8 bg-slate-800/30 rounded-[2rem] border border-slate-800 relative overflow-hidden">
+                                                    <div className="absolute top-0 right-0 w-1 h-full bg-blue-600/30"></div>
+                                                    <span className="text-blue-400 font-bold block mb-3 text-lg">{et.label}:</span>
+                                                    <p className="text-base opacity-90 leading-relaxed text-justify text-slate-300 font-light">{et.content}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    {/* Early Life Section */}
+                                    <section className="space-y-8">
+                                        <h3 className="text-blue-400 font-black text-sm uppercase tracking-widest border-r-4 border-blue-600 pr-5">ילדות, משפחה וחינוך מוקדם</h3>
+                                        <div className="space-y-6">
+                                            <div className="p-8 bg-slate-800/20 rounded-[2rem] border border-slate-800/50">
+                                                <h4 className="text-blue-500/80 text-xs font-bold uppercase mb-4 tracking-widest">רקע ביוגרפי ונסיבות לידה</h4>
+                                                <p className="text-slate-300 text-justify leading-relaxed font-light">{selectedLeader.earlyLife.background}</p>
+                                            </div>
+                                            <div className="p-8 bg-slate-800/20 rounded-[2rem] border border-slate-800/50">
+                                                <h4 className="text-blue-500/80 text-xs font-bold uppercase mb-4 tracking-widest">הקשר משפחתי ודמויות השפעה</h4>
+                                                <p className="text-slate-300 text-justify leading-relaxed font-light">{selectedLeader.earlyLife.family}</p>
+                                            </div>
+                                            <div className="p-8 bg-slate-800/20 rounded-[2rem] border border-slate-800/50">
+                                                <h4 className="text-blue-500/80 text-xs font-bold uppercase mb-4 tracking-widest">מסלול השכלה והכשרה</h4>
+                                                <p className="text-slate-300 text-justify leading-relaxed font-light">{selectedLeader.earlyLife.education}</p>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* Clothing Section */}
+                                    <section className="space-y-8">
+                                        <h3 className="text-blue-400 font-black text-sm uppercase tracking-widest border-r-4 border-blue-600 pr-5">ניתוח לבוש וסממני הופעה</h3>
+                                        <div className="grid grid-cols-1 gap-6">
+                                            {selectedLeader.clothing.map((cl, i) => (
+                                                <div key={i} className="p-8 bg-slate-800/40 rounded-[2.5rem] border border-slate-700/50 flex flex-col md:flex-row gap-6">
+                                                    <div className="bg-blue-600/10 p-4 rounded-2xl h-fit">
+                                                        <i data-lucide="pocket" className="text-blue-400 w-6 h-6"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-bold text-white mb-3 text-lg">{cl.item}</h4>
+                                                        <p className="text-sm opacity-85 text-justify leading-relaxed text-slate-300 font-light">{cl.content}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    {/* Ideology Section */}
+                                    <section className="p-10 bg-blue-600/10 rounded-[3rem] border border-blue-500/20 relative overflow-hidden">
+                                        <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full -translate-x-16 -translate-y-16 blur-3xl"></div>
+                                        <h3 className="text-blue-400 font-black mb-6 uppercase tracking-widest">תפיסה אידיאולוגית ופוליטית</h3>
+                                        <p className="text-2xl font-bold mb-6 text-white tracking-tight leading-tight">{selectedLeader.ideology.core}</p>
+                                        <p className="text-base opacity-90 italic text-justify leading-relaxed text-slate-300 font-light pr-6 border-r-2 border-blue-500/30">{selectedLeader.ideology.details}</p>
+                                    </section>
+
+                                    {/* Achievements Section */}
+                                    <section className="pb-12 space-y-8">
+                                        <h3 className="text-blue-400 font-black text-sm uppercase tracking-widest border-r-4 border-blue-600 pr-5">הישגים מרכזיים ותרומה היסטורית</h3>
+                                        <div className="grid gap-4">
+                                            {selectedLeader.achievements.list.map((ach, i) => (
+                                                <div key={i} className="flex gap-4 items-start p-5 bg-slate-800/20 rounded-2xl border border-slate-800/50 group hover:bg-slate-800/40 transition-all">
+                                                    <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0 group-hover:scale-150 transition-transform shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+                                                    <span className="text-slate-300 text-sm leading-relaxed font-light">{ach}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="mt-8 p-8 bg-slate-950 rounded-3xl border border-slate-800 text-sm text-slate-500 italic shadow-inner">
+                                            <span className="font-bold text-blue-500/70 not-italic uppercase tracking-wider block mb-2">נסיבות עלייה לתפקיד ({selectedLeader.rise.year}):</span> 
+                                            {selectedLeader.rise.reason}
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <footer className="mt-auto border-t border-slate-900 py-16 text-center opacity-40">
+                        <div className="max-w-4xl mx-auto px-6">
+                            <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-slate-500">
+                                © 2026 מרכז המחקר האנתרופולוגי - פותח עבור רם - S25 ULTRA OPTIMIZED
+                            </p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
