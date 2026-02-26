@@ -1,392 +1,279 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, onSnapshot } from 'firebase/firestore';
-import { Home, ShieldCheck, UserCheck, Search, X, Fingerprint, BookOpen, Pocket, Award, ZoomIn, Loader2, Database, Binary, Cpu } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בכירי המדינה - מרכז המחקר האסטרטגי</title>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-// --- Firebase Configuration ---
-const firebaseConfig = JSON.parse(__firebase_config);
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'system-officials-research-v2';
+    <!-- Firebase Compat SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-const App = () => {
-  const [user, setUser] = useState(null);
-  const [officials, setOfficials] = useState([]);
-  const [selectedOfficial, setSelectedOfficial] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [zoomedImage, setZoomedImage] = useState(null);
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400;600;700;800&display=swap');
+        body { font-family: 'Assistant', sans-serif; background-color: #020617; color: #f8fafc; margin: 0; padding: 0; overflow-x: hidden; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+    <div id="root"></div>
 
-  // המידע המחקרי המלא והמורחב ביותר עבור כל 5 האישים
-  const initialOfficialsData = useMemo(() => [
-    {
-      id: "off_10",
-      fullName: "עלי לאריג'אני",
-      role: "יו\"ר המג'לס והאסטרטג הבכיר",
-      years: "1957–הווה",
-      imageUrl: "https://i.postimg.cc/BQxxLP4h/1770132657450.png",
-      etymology: [
-        { label: "שם פרטי: עלי (Ali)", content: "משמעות: 'עליון' או 'נשגב'. השם מקשר אותו ישירות לאימאם עלי בן אבי-טאלב, דמות המופת של השיעה המשלבת חוכמה ושלטון. בקרב משפחת לאריג'אני, השם נועד לשדר הילה של סמכות רוחנית ומוסרית המצופה מבניה של שושלת חכמי דת בכירים." },
-        { label: "שם משפחה: לאריג'אני (Larijani)", content: "ניסבה גאוגרפית המציינת את אזור לאריג'אן במחוז מאזנדראן. השם מסמל כוח פוליטי וממסדי - משפחת לאריג'אני נחשבת ל'קנדיז של איראן', שושלת של אחים המחזיקים במוקדי הכוח המשפטיים, הפרלמנטריים והדתיים של המדינה, תוך השתרשות עמוקה במנגנוני המדינה." }
-      ],
-      earlyLife: {
-        background: "נולד בנג'ף (עיראק), מוקד הקדושה השיעי, למשפחת אצולה דתית. רקע זה העניק לו ביטחון עצמי מוחלט ביכולתו לפרש את רצון האל בתוך המערכת הפוליטית.",
-        family: "בנו של האייתוללה הגדול מירזא האשם אמולי. אחיו מחזיקים בתפקידי מפתח במועצה לשמירת החוקה ובמערכת המשפט. הקשר המשפחתי הפך אותו לאסטרטג שתמיד נמצא במרכז קבלת ההחלטות.",
-        education: "שילוב נדיר של תואר ראשון במדעי המחשב ומתמטיקה עם דוקטורט בפילוסופיה מערבית. השכלה זו יצרה 'מוח היברידי' המסוגל לנתח משברים גאופוליטיים בכלים לוגיים ומתמטיים קשיחים."
-      },
-      clothing: [
-        { item: "חליפת הדיפלומט הטכנוקרטית", content: "לאריג'אני לובש חליפות כהות ומחויטות היטב עם חולצות בעלות 'צווארון דיפלומט' סגור ללא עניבה. זהו קוד לבוש המצהיר על יעילות ניהולית ומודרניות, תוך שמירה על נאמנות מהפכנית ודחיית סממנים מערביים 'דקדנטיים'." },
-        { item: "משקפי האינטלקטואל", content: "השימוש במשקפיים בעלי מסגרת דקה ומינימליסטית מחזק את הדימוי שלו כפילוסוף ואיש אקדמיה שנקרא לשירות המדינה. זהו כלי חזותי המציב אותו כ'מוח' שמאחורי המהלכים האסטרטגיים ופחות כאיש של עוצמה פיזית." }
-      ],
-      ideology: { core: "שמרנות פרגמטית", details: "אמונה שהישרדות המשטר תלויה בשילוב בין נאמנות לערכי 1979 לבין שכלתנות פוליטית ודיפלומטיה מתוחכמת מול המעצמות." },
-      achievements: { list: ["יו\"ר המג'לס במשך 12 שנים רצופות", "ניהול המועצה העליונה לביטחון לאומי ותיק הגרעין", "אדריכל הסכמים אסטרטגיים ארוכי טווח מול סין", "ראש רשות השידור האיראנית בתקופת עיצוב התודעה"] },
-      rise: { reason: "ייחוס דתי משפחתי כבד וכישורים אנליטיים נדירים במערכת.", year: "2008" }
-    },
-    {
-      id: "off_11",
-      fullName: "מוחמד ג'וואד זריף",
-      role: "שר החוץ והדיפלומט הראשי (לשעבר)",
-      years: "1960–הווה",
-      imageUrl: "https://i.postimg.cc/xdk7SPVF/1770134858997.png",
-      etymology: [
-        { label: "שם פרטי: מוחמד ג'וואד", content: "ג'וואד הוא כינויו של האימאם התשיעי, הידוע בנדיבותו ובנועם הליכותיו. השם מרמז על אדם בעל קסם אישי ויכולת תקשורתית גבוהה, תכונות שהפכו לסימן ההיכר של זריף בשיחותיו עם מנהיגי המערב." },
-        { label: "שם משפחה: זריף (Zarif)", content: "פירושו בפרסית: עדין, שנון, חכם או אסתטי. השם משקף במדויק את ה'עוצמה הרכה' שזריף הקרין - דיפלומטיה מעודנת, חיוך תמידי ויכולת להעביר מסרים קשוחים בעטיפה אלגנטית ושנונה שזכתה להערכה בעולם." }
-      ],
-      earlyLife: {
-        background: "נולד בטהראן למשפחת סוחרים עשירה מהבאזאר. הוריו היו כה שמרנים שמנעו ממנו חשיפה לטלוויזיה, דבר שיצר אצלו זהות דואלית: שמרנות דתית פנימית מול הבנה עמוקה של המערב.",
-        family: "משפחתו הייתה חלק מהמעמד ה'באזארי' - הכוח הכלכלי של המהפכה. זריף בחר במסלול אקדמי-מערבי אך נשאר קשור למקורות הכוח הדתיים והכלכליים באיראן.",
-        education: "עזב לארה\"ב בגיל 17. סיים דוקטורט במשפט בינלאומי באוניברסיטת דנבר. הוא נחשב למומחה הגדול ביותר באיראן ל'פסיכולוגיה של הממשל האמריקאי'."
-      },
-      clothing: [
-        { item: "החליפה ה'זריף-סטייל'", content: "זריף בחר בחליפות מחויטות במיטב המסורת המערבית אך ללא עניבה. החליפות שלו בלטו באיכותן ובצבעים רגועים שנועדו לשדר פתיחות, רציונליות ודיאלוג. המראה שלו נועד להראות שאיראן היא מדינה ציוויליזציונית המכירה את כללי המשחק העולמיים." },
-        { item: "חולצת הצווארון הלבן הסגורה", content: "הקפדתו על חולצות לבנות מגוהצות, סגורות עד הכפתור האחרון, הייתה סמל לטוהר מהפכני. לבוש זה נועד להזכיר לצופים באיראן כי למרות שנותיו במערב, הוא נותר נאמן לערכי היסוד של הרפובליקה." }
-      ],
-      ideology: { core: "עוצמה רכה ואינטראקציה בונה", details: "אמונה שהסרת הבידוד של איראן ושילובה בכלכלה העולמית הם כלי ההגנה הטובים ביותר על ריבונותה." },
-      achievements: { list: ["האדריכל המרכזי של הסכם הגרעין (JCPOA) ב-2015", "שגריר איראן באו\"ם לאורך שנים קריטיות", "שיפור דרמטי בתדמיתה הדיפלומטית של איראן", "מינוי לסגן נשיא בממשלת פזשכיאן ב-2024"] },
-      rise: { reason: "הבנתו העמוקה את המערב ויכולת המשא ומתן המבריקה שלו.", year: "2013" }
-    },
-    {
-      id: "off_12",
-      fullName: "קאסם סולימאני",
-      role: "מפקד כוח קודס המיתולוגי",
-      years: "1957–2020",
-      imageUrl: "https://i.postimg.cc/MKyyMfq0/1770132682840.png",
-      etymology: [
-        { label: "שם פרטי: קאסם (Qasem)", content: "פירושו 'המחלק' או 'המשתף'. במסורת השיעית השם מקושר לאימאם עלי כמי שמחלק בין גן עדן לגיהינום. עבור סולימאני, השם שיקף דמות בעלת סמכות גורלית המכריעה בין חיים למוות בשדות הקרב ברחבי המזרח התיכון." },
-        { label: "שם משפחה: סולימאני (Soleimani)", content: "על שמו של שלמה המלך (סולימאן). באסלאם, סולימאן מסמל חוכמה עילאית, שליטה ברוחות ועוצמה אימפריאלית. השם מחבר את קאסם למורשת של מנהיגות צבאית ורוחנית רחבת היקף החורגת מגבולות איראן." }
-      ],
-      earlyLife: {
-        background: "נולד בכפר עני ונידח במחוז כרמאן. עבד כפועל בניין בנעוריו כדי לסייע לאביו האיכר לשלם חובות, רקע קשה זה בנה אצלו קשיחות פיזית ומחויבות עמוקה למעמד המוחלש.",
-        family: "משפחה כפרית פשוטה ואדוקה. המקור העממי שלו הפך אותו לדמות נערצת בקרב השכבות העניות באיראן ובעולם הערבי, שראו בו 'אחד משלהם' שהגיע לצמרת הכוח.",
-        education: "השכלתו הפורמלית הייתה מועטה. השדה היה האקדמיה שלו. הצטרף למשמרות המהפכה ב-1979 והתבלט כמפקד צעיר ונועז במלחמת איראן-עיראק, שם פיתח את תורת הלחימה שלו."
-      },
-      clothing: [
-        { item: "מדי החאקי והז'קט הצבאי הפשוט", content: "סולימאני הופיע תמיד בחליפות חאקי פשוטות, לרוב עם ז'קט צבאי אפור או ירוק-זית ללא דרגות בולטות או עיטורים. לבוש זה שידר 'חייל בשירות המהפכה' ולא גנרל מהודר. זו הייתה הצהרה על ענווה דתית ועל נוכחות מתמדת בחזית עם לוחמיו." },
-        { item: "הזקן הלבן המטופח", content: "זקנו הקצר והלבן הפך לסימן היכר של חוכמה וניסיון קרבי. המראה שלו הקרין דמות של 'אב' או 'מנטור' רוחני ללוחמי המיליציות, דמות שהיא יותר איקונה מאשר דמות צבאית טכנית." }
-      ],
-      ideology: { core: "ייצוא המהפכה ו'הגנה קדמית'", details: "תפיסה לפיה הגבולות של איראן נמצאים בים התיכון. האמין בבניית 'טבעת אש' של מיליציות סביב אויבי איראן כדי להרחיק את המלחמה מאדמתה." },
-      achievements: { list: ["הפיכת כוח קודס לזרוע אסטרטגית עולמית", "הצלת משטר אסד בסוריה ומאבק בדאע\"ש", "הקמת המיליציות השיעיות בעיראק ותימן", "חימוש דרמטי של חיזבאללה והפיכתו לצבא אזורי"] },
-      rise: { reason: "אומץ לב פנומנלי בשטח ונאמנות מוחלטת למנהיג העליון.", year: "1998" }
-    },
-    {
-      id: "off_13",
-      fullName: "עבאס עראקצ'י",
-      role: "שר החוץ הנוכחי",
-      years: "1962–הווה",
-      imageUrl: "https://i.postimg.cc/rFfsy1tC/1770184472263.png",
-      etymology: [
-        { label: "שם פרטי: עבאס (Abbas)", content: "משמעות: 'זועף' או 'אריה המעורר יראה'. על שמו של עבאס בן עלי, גיבור קרב כרבלא ונושא הנס, המהווה סמל עליון לנאמנות והקרבה בשיעה. השם נועד לשדר אמינות ומסירות בלתי מתפשרת למטרה." },
-        { label: "שם משפחה: עראקצ'י (Araghchi)", content: "מקור השם הוא כנראה במקצוע 'אורג העראקצ'ין' (סוג של כיסוי ראש מסורתי). השם מעיד על מוצא מעמדי יצרני ועל קשר למסורות האומנות הישנות של איראן, מה שמחבר אותו לשורשי החברה האיראנית." }
-      ],
-      earlyLife: {
-        background: "נולד בטהראן למשפחה שמרנית ממעמד הביניים. התגייס למשמרות המהפכה בגיל 17 עם פרוץ המהפכה ושירת בחזית מול עיראק, שם עוצב אופיו כלוחם שירות המדינה.",
-        family: "משפחה טהראנית שורשית. הרקע הקרבי שלו במשמרות המהפכה מקנה לו 'תעודת ביטוח' וקרדיט מהפכני רב בתוך הממסד השמרני, למרות השכלתו המערבית.",
-        education: "דוקטורט במדעי המדינה מאוניברסיטת קנט (בריטניה). שילוב נדיר של 'לוחם' מהפכני ו'אינטלקטואל' המבין לעומק את השיח הפוליטי האירופי והבינלאומי."
-      },
-      clothing: [
-        { item: "לבוש הטכנוקרט השמרני", content: "עראקצ'י מקפיד על הופעה רשמית ומאופקת מאוד. הוא לובש חליפות כהות בעלות גזרה פשוטה עם חולצת צווארון סגורה. לבוש זה נועד לשדר רצינות של איש מקצוע ודיפלומט קר רוח, ולא של פוליטיקאי ראוותני המחפש את אור הזרקורים." },
-        { item: "החזות המאופקת", content: "הופעתו החיצונית נועדה להקרין יציבות ומשכיות. הוא נמנע מסממני מותרות ומעדיף מראה אחיד המזוהה עם שירות המדינה האיראני, כזה המבקש להדגיש את הטיעון הדיפלומטי ולא את האישיות." }
-      ],
-      ideology: { core: "פרגמטיזם ביטחוני", details: "אסטרטגיה המנסה לגשר בין הצרכים הדיפלומטיים מול המערב לבין דרישות הממסד הביטחוני הנוקשה מבית. מאמין בדיפלומטיה המשרתת את עוצמת הביטחון הלאומי." },
-      achievements: { list: ["היה מספר 2 בצוות המשא ומתן להסכם הגרעין", "שגריר איראן ביפן ובפינלנד", "סגן שר החוץ לעניינים מדיניים לאורך עשור", "הובלת משרד החוץ בממשלת פזשכיאן בתקופה סוערת"] },
-      rise: { reason: "שילוב של רקע קרבי במשמרות המהפכה עם ניסיון דיפלומטי מערבי עשיר.", year: "2024" }
-    },
-    {
-      id: "off_14",
-      fullName: "עלי שמח'אני",
-      role: "מזכיר המועצה לביטחון לאומי (לשעבר)",
-      years: "1955–הווה",
-      imageUrl: "https://i.postimg.cc/43vqLk0C/1770564301501.png",
-      etymology: [
-        { label: "שם פרטי: עלי (Ali)", content: "חיבור לאימאם הראשון וסמל לסמכות מנהיגותית וצדק. עבור שמח'אני, השם מהווה עוגן של זהות שיעית מובהקת בתוך מוצאו האתני הערבי." },
-        { label: "שם משפחה: שמח'אני (Shamkhani)", content: "שם משפחה ערבי אותנטי המעיד על השתייכות לשבט ה'שמאח'נה' בדרום איראן. מוצאו האתני מעניק לו יתרון גיאופוליטי אדיר בשיח מול מדינות המפרץ הערביות, כמי שמבין את הקודים התרבותיים והשבטיים שלהן." }
-      ],
-      earlyLife: {
-        background: "נולד באהוואז למשפחה ערבית-שיעית. היה ממתנגדי משטר השאה ולאחר המהפכה הפך לאחד ממקימי משמרות המהפכה במחוז ח'וזיסטאן, שם הוכיח נאמנות מוחלטת למדינה הפרסית.",
-        family: "משפחה ערבית-איראנית גאה. העובדה שהגיע לצמרת הביטחונית למרות היותו בן מיעוט אתני מעידה על יכולותיו המקצועיות הגבוהות ועל האמון המוחלט שנתן בו המנהיג העליון.",
-        education: "למד הנדסה באוניברסיטת אהוואז ולאחר מכן ניהול אסטרטגי. הוא התמחה באסטרטגיה ימית ובביטחון לאומי, והפך לאחד המומחים הגדולים במזרח התיכון לאיומים ימיים."
-      },
-      clothing: [
-        { item: "מדי אדמירל וחליפות שרד", content: "בתור איש צבא, הופיע שמח'אני רבות במדי חיל הים הלבנים והמרשימים, שנועדו להקרין עוצמה ריבונית במפרץ. כפוליטיקאי, עבר לחליפות אפורות כהות המקנות מראה של אסטרטג שקול ודיפלומט ביטחוני בכיר היודע לסגור עסקאות מאחורי הקלעים." },
-        { item: "שילוב סממנים", content: "הופעתו משלבת סמכות צבאית עם נגישות פוליטית, מראה של אדם שחש בנוח גם בחדרי מבצעים וגם בארמונות של מנהיגי המפרץ." }
-      ],
-      ideology: { core: "פיוס אזורי וביטחון משולב", details: "אמונה שביטחון לאומי אינו מבוסס רק על כוח צבאי, אלא על רשת של בריתות אזוריות וכלכלה יציבה המונעת התערבות זרה." },
-      achievements: { list: ["אדריכל הסכם חידוש היחסים עם ערב הסעודית (2023)", "שר ההגנה במשך 8 שנים", "מזכיר המועצה העליונה לביטחון לאומי במשך עשור", "מפקד חיל הים של משמרות המהפכה ושל הצבא בו-זמנית"] },
-      rise: { reason: "מומחיות אסטרטגית ויכולת לגשר בין העולם הערבי והפרסי.", year: "2013" }
-    }
-  ], []);
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
 
-  // --- Auth & Sync ---
-  useEffect(() => {
-    const initApp = async () => {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-      } catch (err) { console.error("Auth:", err); }
-    };
-    initApp();
-    const unsub = onAuthStateChanged(auth, setUser);
-    return () => unsub();
-  }, []);
+        // --- הנתונים המורחבים ביותר (5 אישים) ---
+        const OFFICIALS_DATA = [
+            {
+                id: "off_10",
+                fullName: "עלי לאריג'אני",
+                role: "יו\"ר המג'לס והאסטרטג הבכיר",
+                years: "1957–הווה",
+                imageUrl: "https://i.postimg.cc/BQxxLP4h/1770132657450.png",
+                etymology: [
+                    { label: "שם פרטי: עלי (Ali)", content: "משמעות: 'עליון' או 'נשגב'. השם מקשר אותו ישירות לאימאם עלי בן אבי-טאלב, דמות המופת של השיעה המשלבת חוכמה ושלטון. בקרב משפחת לאריג'אני, השם נועד לשדר הילה של סמכות רוחנית ומוסרית המצופה מבניה של שושלת חכמי דת בכירים." },
+                    { label: "שם משפחה: לאריג'אני (Larijani)", content: "ניסבה גאוגרפית המציינת את אזור לאריג'אן במחוז מאזנדראן. השם מסמל כוח פוליטי וממסדי - משפחת לאריג'אני נחשבת ל'קנדיז של איראן', שושלת של אחים המחזיקים במוקדי הכוח המשפטיים, הפרלמנטריים והדתיים של המדינה." }
+                ],
+                earlyLife: {
+                    background: "נולד בנג'ף (עיראק), מוקד הקדושה השיעי, למשפחת אצולה דתית. רקע זה העניק לו ביטחון עצמי מוחלט ביכולתו לפרש את רצון האל בתוך המערכת הפוליטית.",
+                    family: "בנו של האייתוללה הגדול מירזא האשם אמולי. אחיו מחזיקים בתפקידי מפתח במועצה לשמירת החוקה ובמערכת המשפט. הקשר המשפחתי הפך אותו לאסטרטג שתמיד נמצא במרכז קבלת ההחלטות.",
+                    education: "שילוב נדיר של תואר ראשון במדעי המחשב ומתמטיקה עם דוקטורט בפילוסופיה מערבית. השכלה זו יצרה 'מוח היברידי' המסוגל לנתח משברים גאופוליטיים בכלים לוגיים ומתמטיים קשיחים."
+                },
+                clothing: [
+                    { item: "חליפת הדיפלומט הטכנוקרטית", content: "לאריג'אני לובש חליפות כהות ומחויטות היטב עם חולצות בעלות 'צווארון דיפלומט' סגור ללא עניבה. זהו קוד לבוש המצהיר על יעילות ניהולית ומודרניות, תוך שמירה על נאמנות מהפכנית ודחיית סממנים מערביים 'דקדנטיים'." },
+                    { item: "משקפי האינטלקטואל", content: "השימוש במשקפיים בעלי מסגרת דקה ומינימליסטית מחזק את הדימוי שלו כפילוסוף ואיש אקדמיה שנקרא לשירות המדינה. זהו כלי חזותי המציב אותו כ'מוח' שמאחורי המהלכים האסטרטגיים." }
+                ],
+                ideology: { core: "שמרנות פרגמטית", details: "אמונה שהישרדות המשטר תלויה בשילוב בין נאמנות לערכי 1979 לבין שכלתנות פוליטית ודיפלומטיה מתוחכמת מול המעצמות." },
+                achievements: { list: ["יו\"ר המג'לס במשך 12 שנים רצופות", "ניהול המועצה העליונה לביטחון לאומי", "אדריכל הסכם ה-25 שנה עם סין", "ראש רשות השידור האיראנית"] },
+                rise: { reason: "ייחוס דתי משפחתי כבד וכישורים אנליטיים נדירים.", year: "2008" }
+            },
+            {
+                id: "off_11",
+                fullName: "מוחמד ג'וואד זריף",
+                role: "שר החוץ והדיפלומט הראשי (לשעבר)",
+                years: "1960–הווה",
+                imageUrl: "https://i.postimg.cc/xdk7SPVF/1770134858997.png",
+                etymology: [
+                    { label: "שם פרטי: מוחמד ג'וואד", content: "ג'וואד הוא כינויו של האימאם התשיעי, הידוע בנדיבותו ובנועם הליכותיו. השם מרמז על אדם בעל קסם אישי ויכולת תקשורתית גבוהה, תכונות שהפכו לסימן ההיכר של זריף בשיחותיו הבינלאומיות." },
+                    { label: "שם משפחה: זריף (Zarif)", content: "פירושו בפרסית: עדין, שנון, חכם או אסתטי. השם משקף בדיוק את ה'עוצמה הרכה' שזריף הקרין - דיפלומטיה מעודנת, חיוך תמידי ויכולת להעביר מסרים קשוחים בעטיפה אלגנטית." }
+                ],
+                earlyLife: {
+                    background: "נולד בטהראן למשפחת סוחרים עשירה. הוריו היו כה שמרנים שמנעו ממנו חשיפה לטלוויזיה, דבר שיצר אצלו זהות דואלית: שמרנות דתית פנימית מול הבנה עמוקה של המערב.",
+                    family: "משפחתו הייתה חלק מהמעמד ה'באזארי' - הכוח הכלכלי של המהפכה. זריף בחר במסלול אקדמי-מערבי אך נשאר קשור למקורות הכוח הדתיים והכלכליים באיראן.",
+                    education: "عזב לארה\"ב בגיל 17. סיים דוקטורט במשפט בינלאומי באוניברסיטת דנבר. הוא נחשב למומחה הגדול ביותר באיראן ל'פסיכולוגיה של הממשל האמריקאי'."
+                },
+                clothing: [
+                    { item: "החליפה ה'זריף-סטייל'", content: "זריף בחר בחליפות מחויטות במיטב המסורת המערבית אך ללא עניבה. החליפות שלו נועדו לשדר פתיחות, רציונליות ודיאלוג. המראה שלו נועד להראות שאיראן היא מדינה ציוויליזציונית המכירה את כללי המשחק." },
+                    { item: "חולצת הצווארון הלבן הסגורה", content: "הקפדתו על חולצות לבנות מגוהצות, סגורות עד הכפתור האחרון, הייתה סמל לטוהר מהפכני. לבוש זה נועד להזכיר כי למרות שנותיו במערב, הוא נותר נאמן לערכי היסוד של הרפובליקה." }
+                ],
+                ideology: { core: "אינטראקציה בונה", details: "אמונה שביטול הבידוד של איראן ושילובה בכלכלה העולמית הם כלי ההגנה הטובים ביותר על ריבונותה." },
+                achievements: { list: ["אדריכל הסכם הגרעין (JCPOA) ב-2015", "שגריר איראן באו\"ם לאורך שנים", "שיפור דרמטי בתדמית הדיפלומטית", "סגן נשיא בממשלת פזשכיאן"] },
+                rise: { reason: "הבנה עמוקה של הפוליטיקה האמריקאית ויכולת משא ומתן פנומנלית.", year: "2013" }
+            },
+            {
+                id: "off_12",
+                fullName: "קאסם סולימאני",
+                role: "מפקד כוח קודס המיתולוגי",
+                years: "1957–2020",
+                imageUrl: "https://i.postimg.cc/MKyyMfq0/1770132682840.png",
+                etymology: [
+                    { label: "שם פרטי: קאסם", content: "פירושו 'המחלק' או 'המשתף'. בשיעה השם מקושר לאימאם עלי כמי שמחלק בין גן עדן לגיהינום. עבור סולימאני, השם שיקף דמות בעלת סמכות גורלית המכריעה בין חיים למוות בשדות הקרב." },
+                    { label: "שם משפחה: סולימאני", content: "על שמו של שלמה המלך. במסורת האסלאמית, סולימאן מסמל חוכמה עילאית, שליטה ברוחות ועוצמה אימפריאלית. השם מחבר את קאסם למורשת של מנהיגות צבאית ורוחנית רחבת היקף." }
+                ],
+                earlyLife: {
+                    background: "נולד בכפר עני בכרמאן. עבד כפועל בניין בנעוריו כדי לסייע לאביו האיכר לשלם חובות, רקע קשה זה בנה אצלו קשיחות פיזית ומחויבות עמוקה למעמד המוחלש.",
+                    family: "משפחה כפרית פשוטה ואדוקה. המקור העממי שלו הפך אותו לדמות נערצת בקרב השכבות העניות באיראן ובעולם הערבי, שראו בו 'אחד משלהם' שהגיע לצמרת.",
+                    education: "השכלתו הפורמלית הייתה מועטה. השדה היה האקדמיה שלו. הצטרף למשמרות המהפכה ב-1979 והתבלט כמפקד צעיר ונועז במלחמת איראן-עיראק."
+                },
+                clothing: [
+                    { item: "מדי החאקי והז'קט הפשוט", content: "סולימאני סירב ללבוש מדי שרד מהודרים. הוא הופיע תמיד בחליפות חאקי פשוטות, לרוב עם ז'קט צבאי אפור או ירוק-זית ללא דרגות. לבוש זה שידר 'חייל בשירות המהפכה' ולא גנרל מנותק." },
+                    { item: "הזקן הלבן המטופח", content: "זקנו הקצר והלבן הפך לסימן היכר של חוכמה וניסיון קרבי. המראה שלו הקרין דמות של 'אב' או 'מנטור' רוחני ללוחמי המיליציות, דמות שהיא יותר איקונה מאשר דמות צבאית טכנית." }
+                ],
+                ideology: { core: "ייצוא המהפכה והגנה קדמית", details: "תפיסה לפיה הגבולות של איראן נמצאים בים התיכון. האמין בבניית 'טבעת אש' של מיליציות סביב האויבים כדי להרחיק את המלחמה מאדמת איראן." },
+                achievements: { list: ["הפיכת כוח קודס לזרוע אסטרטגית עולמית", "הצלת משטר אסד בסוריה ומאבק בדאע\"ש", "הקמת המיליציות השיעיות בעיראק ותימן", "חימוש דרמטי של חיזבאללה"] },
+                rise: { reason: "אומץ לב פנומנלי בשטח ונאמנות מוחלטת למנהיג העליון.", year: "1998" }
+            },
+            {
+                id: "off_13",
+                fullName: "עבאס עראקצ'י",
+                role: "שר החוץ הנוכחי",
+                years: "1962–הווה",
+                imageUrl: "https://i.postimg.cc/rFfsy1tC/1770184472263.png",
+                etymology: [
+                    { label: "שם פרטי: עבאס", content: "משמעות: 'אריה המעורר יראה'. על שמו של עבאס בן עלי, גיבור קרב כרבלא ונושא הנס, המהווה סמל עליון לנאמנות והקרבה בשיעה. השם נועד לשדר אמינות ומסירות בלתי פשרנית." },
+                    { label: "שם משפחה: עראקצ'י", content: "מקור השם הוא במקצוע 'אורג העראקצ'ין' (כיסוי ראש מסורתי). השם מעיד על מוצא מעמדי יצרני ועל קשר למסורות האומנות הישנות של איראן." }
+                ],
+                earlyLife: {
+                    background: "נולד בטהראן למשפחה שמרנית. התגייס למשמרות המהפכה בגיל 17 עם פרוץ המהפכה ושירת בחזית מול עיראק, שם עוצב אופיו כלוחם שירות המדינה.",
+                    family: "משפחה טהראנית שורשית. הרקע הקרבי שלו במשמרות המהפכה מקנה לו 'תעודת ביטוח' וקרדיט מהפכני רב בתוך הממסד השמרני, למרות השכלתו המערבית.",
+                    education: "דוקטורט במדעי המדינה מאוניברסיטת קנט (בריטניה). שילוב נדיר של 'לוחם' מהפכני ו'אינטלקטואל' המבין לעומק את השיח הפוליטי האירופי."
+                },
+                clothing: [
+                    { item: "לבוש הטכנוקרט השמרני", content: "עראקצ'י מקפיד על הופעה רשמית ומאופקת מאוד. הוא לובש חליפות כהות בעלות גזרה פשוטה עם חולצת צווארון סגורה. לבוש זה נועד לשדר רצינות של איש מקצוע ודיפלומט קר רוח." },
+                    { item: "החזות המאופקת", content: "הופעתו החיצונית נועדה להקרין יציבות ומשכיות. הוא נמנע מסממני מותרות ומעדיף מראה אחיד המזוהה עם שירות המדינה האיראני." }
+                ],
+                ideology: { core: "פרגמטיזם ביטחוני", details: "אסטרטגיה המנסה לגשר בין הצרכים הדיפלומטיים מול המערב לבין דרישות הממסד הביטחוני הנוקשה מבית." },
+                achievements: { list: ["היה מספר 2 בצוות המשא ומתן להסכם הגרעין", "שגריר איראן ביפן ובפינלנד", "סגן שר החוץ לעניינים מדיניים לאורך עשור", "הובלת משרד החוץ בממשלת פזשכיאן"] },
+                rise: { reason: "שילוב של רקע קרבי עם ניסיון דיפלומטי מערבי עשיר.", year: "2024" }
+            },
+            {
+                id: "off_14",
+                fullName: "עלי שמח'אני",
+                role: "מזכיר המועצה לביטחון לאומי (לשעבר)",
+                years: "1955–הווה",
+                imageUrl: "https://i.postimg.cc/43vqLk0C/1770564301501.png",
+                etymology: [
+                    { label: "שם פרטי: עלי", content: "חיבור לאימאם הראשון וסמל לסמכות מנהיגותית וצדק. עבור שמח'אני, השם מהווה עוגן של זהות שיעית מובהקת בתוך מוצאו האתני הערבי." },
+                    { label: "שם משפחה: שמח'אני", content: "שם משפחה ערבי אותנטי המעיד על השתייכות לשבט ה'שמאח'נה' בדרום איראן. מוצאו האתני מעניק לו יתרון גיאופוליטי אדיר בשיח מול מדינות המפרץ." }
+                ],
+                earlyLife: {
+                    background: "נולד באהוואז למשפחה ערבית-שיעית. היה ממתנגדי משטר השאה ולאחר המהפכה הפך לאחד ממקימי משמרות המהפכה בח'וזיסטאן, שם הוכיח נאמנות מוחלטת.",
+                    family: "משפחה ערבית-איראנית גאה. העובדה שהגיע לצמרת הביטחונית למרות היותו בן מיעוט אתני מעידה על יכולותיו המקצועיות הגבוהות והאמון שניתן בו.",
+                    education: "למד הנדסה ולאחר מכן ניהול אסטרטגי. הוא התמחה באסטרטגיה ימית ובביטחון לאומי, והפך לאחד המומחים הגדולים במזרח התיכון לאיומים ימיים."
+                },
+                clothing: [
+                    { item: "מדי אדמירל וחליפות שרד", content: "בתור איש צבא, הופיע שמח'אני רבות במדי חיל הים הלבנים המרשימים, שנועדו להקרין עוצמה ריבונית. כפוליטיקאי, עבר לחליפות אפורות כהות המקנות מראה של אסטרטג שקול." },
+                    { item: "שילוב סממנים", content: "הופעתו משלבת סמכות צבאית עם נגישות פוליטית, מראה של אדם שחש בנוח גם בחדרי מבצעים וגם בארמונות של מנהיגי המפרץ." }
+                ],
+                ideology: { core: "פיוס אזורי וביטחון משולב", details: "אמונה שביטחון לאומי אינו מבוסס רק על כוח צבאי, אלא על רשת של בריתות אזוריות וכלכלה יציבה." },
+                achievements: { list: ["אדריכל הסכם חידוש היחסים עם ערב הסעודית (2023)", "שר ההגנה במשך 8 שנים", "מזכיר המועצה העליונה לביטחון לאומי", "מפקד חיל הים של משמרות המהפכה והצבא"] },
+                rise: { reason: "מומחיות אסטרטגית ויכולת לגשר בין העולם הערבי והפרסי.", year: "2013" }
+            }
+        ];
 
-  useEffect(() => {
-    if (!user) return;
-    const officialsRef = collection(db, 'artifacts', appId, 'public', 'data', 'officials');
-    setOfficials(initialOfficialsData);
-    setLoading(false);
+        const App = () => {
+            const [officials, setOfficials] = useState(OFFICIALS_DATA);
+            const [selectedOfficial, setSelectedOfficial] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [zoomedImage, setZoomedImage] = useState(null);
+            const [syncing, setSyncing] = useState(true);
 
-    const unsubSnap = onSnapshot(officialsRef, (snap) => {
-      if (!snap.empty) {
-        setOfficials(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-      } else {
-        initialOfficialsData.forEach(async (off) => {
-          await setDoc(doc(officialsRef, off.id), off);
-        });
-      }
-    });
-    return () => unsubSnap();
-  }, [user, initialOfficialsData]);
+            // --- אתחול Firebase בשיטה בטוחה ---
+            useEffect(() => {
+                const initFirebase = async () => {
+                    try {
+                        const firebaseConfig = JSON.parse(__firebase_config);
+                        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                        const db = firebase.firestore();
+                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'system-officials-research-v2';
+                        
+                        await firebase.auth().signInAnonymously();
+                        
+                        const offRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('officials');
+                        
+                        offRef.onSnapshot((snap) => {
+                            if (!snap.empty) {
+                                const cloudData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                                setOfficials(cloudData);
+                            } else {
+                                OFFICIALS_DATA.forEach(o => offRef.doc(o.id).set(o));
+                            }
+                            setSyncing(false);
+                        });
+                    } catch (err) {
+                        console.error("Sync error:", err);
+                        setSyncing(false);
+                    }
+                };
+                initFirebase();
+            }, []);
 
-  const filteredOfficials = useMemo(() => {
-    return officials.filter(o => 
-      o.fullName.includes(searchTerm) || o.role.includes(searchTerm)
-    );
-  }, [officials, searchTerm]);
+            useEffect(() => { if (window.lucide) lucide.createIcons(); }, [officials, selectedOfficial, searchTerm]);
 
-  return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-['Assistant']">
-      
-      <nav className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex items-center h-16 gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-slate-800 text-slate-300 active:scale-95">
-              <Home className="w-4 h-4" />
-              <span>ראשי</span>
-            </button>
-            <div className="h-6 w-px bg-slate-800"></div>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold text-slate-400 border border-transparent hover:bg-slate-800 hover:text-white transition-all active:scale-95">
-              <ShieldCheck className="w-4 h-4" />
-              <span>מנהיגי מדינה</span>
-            </button>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-blue-600 text-white shadow-lg shadow-blue-900/40">
-              <UserCheck className="w-4 h-4" />
-              <span>בכירי מדינה</span>
-            </div>
-          </div>
-        </div>
-      </nav>
+            const filtered = officials.filter(o => 
+                o.fullName.includes(searchTerm) || o.role.includes(searchTerm)
+            );
 
-      <main className="flex-grow max-w-4xl mx-auto px-6 py-12 md:py-16 space-y-12 animate-fade-in">
-        <header className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="p-4 bg-blue-500/10 rounded-[2rem] border border-blue-500/20">
-              <UserCheck className="w-12 h-12 text-blue-500" />
-            </div>
-            <div>
-              <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white uppercase">בכירי המדינה</h1>
-              <p className="text-blue-500 font-medium text-lg">מחקר אסטרטגי, אנתרופולוגי ואטימולוגי מורחב</p>
-            </div>
-          </div>
-          
-          <div className="relative group max-w-md">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
-            <input 
-              type="text" 
-              placeholder="חיפוש בכיר..."
-              className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl py-4 pr-12 pl-4 text-sm focus:outline-none focus:border-blue-500/50 transition-all shadow-inner"
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </header>
-
-        {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">מתחבר למסד הנתונים...</p>
-            </div>
-        ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
-                {filteredOfficials.map(official => (
-                    <div 
-                        key={official.id}
-                        onClick={() => setSelectedOfficial(official)}
-                        className="bg-slate-900/40 border border-slate-800 rounded-[2.5rem] p-6 flex gap-6 cursor-pointer hover:border-blue-500/40 transition-all group relative overflow-hidden active:scale-[0.97]"
-                    >
-                        <div className="w-24 h-24 rounded-3xl overflow-hidden border border-slate-700 shrink-0 bg-slate-800 shadow-xl relative">
-                            <img src={official.imageUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100" />
+            return (
+                <div className="min-h-screen flex flex-col bg-slate-950">
+                    <nav className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50">
+                        <div className="max-w-4xl mx-auto px-4 flex items-center h-16 gap-3">
+                            <a href="state_leaders.html" className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold text-slate-400 hover:text-white transition-all"><i data-lucide="shield-check" className="w-4 h-4"></i><span>מנהיגי מדינה</span></a>
+                            <button className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-blue-600 text-white shadow-lg"><i data-lucide="user-check" className="w-4 h-4"></i><span>בכירי מדינה</span></button>
+                            {syncing && <div className="mr-auto"><i data-lucide="loader-2" className="w-4 h-4 animate-spin text-blue-500"></i></div>}
                         </div>
-                        <div className="flex flex-col justify-center min-w-0">
-                            <h2 className="text-xl font-bold text-white truncate group-hover:text-blue-400 transition-colors">{official.fullName}</h2>
-                            <p className="text-blue-500 text-[10px] font-black uppercase tracking-widest mt-1">{official.years}</p>
-                            <p className="text-slate-400 text-xs mt-2 line-clamp-2 leading-relaxed font-light">{official.role}</p>
+                    </nav>
+
+                    <main className="flex-grow max-w-4xl mx-auto px-6 py-12 space-y-12 animate-fade-in">
+                        <header className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="p-4 bg-blue-500/10 rounded-3xl border border-blue-500/20"><i data-lucide="user-check" className="w-12 h-12 text-blue-500"></i></div>
+                                <div><h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white uppercase">בכירי המדינה</h1><p className="text-blue-500 font-medium">מחקר אסטרטגי ואטימולוגי מורחב</p></div>
+                            </div>
+                            <div className="relative max-w-md">
+                                <i data-lucide="search" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                                <input type="text" placeholder="חיפוש בכיר..." className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl py-4 pr-12 pl-4 text-sm focus:outline-none focus:border-blue-500 transition-all shadow-inner" onChange={e => setSearchTerm(e.target.value)} />
+                            </div>
+                        </header>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
+                            {filtered.map(official => (
+                                <div key={official.id} onClick={() => setSelectedOfficial(official)} className="bg-slate-900/40 border border-slate-800 rounded-[2.5rem] p-6 flex gap-6 cursor-pointer hover:border-blue-500/40 transition-all group active:scale-[0.97]">
+                                    <img src={official.imageUrl} className="w-24 h-24 rounded-3xl object-cover grayscale group-hover:grayscale-0 transition-all duration-700 shadow-xl" />
+                                    <div className="flex flex-col justify-center min-w-0">
+                                        <h2 className="text-xl font-bold text-white truncate group-hover:text-blue-400">{official.fullName}</h2>
+                                        <p className="text-blue-500 text-[10px] font-black uppercase tracking-widest mt-1">{official.years}</p>
+                                        <p className="text-slate-400 text-xs mt-2 line-clamp-1">{official.role}</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    </div>
-                ))}
-            </div>
-        )}
-      </main>
+                    </main>
 
-      {/* Research Modal */}
-      {selectedOfficial && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6 overflow-hidden">
-          <div className="absolute inset-0 bg-slate-950/98 backdrop-blur-2xl" onClick={() => setSelectedOfficial(null)}></div>
-          <div className="relative w-full max-w-4xl bg-slate-900 md:rounded-[3.5rem] h-full md:h-auto md:max-h-[92vh] overflow-y-auto no-scrollbar border border-slate-800 shadow-2xl animate-fade-in flex flex-col">
-            
-            {/* Header - NON STICKY */}
-            <div className="p-8 md:p-12 border-b border-slate-800/50 flex justify-between items-center">
-              <div className="flex items-center gap-6">
-                <div 
-                    className="w-20 h-20 rounded-[2rem] overflow-hidden border-2 border-blue-500/30 bg-slate-800 shadow-2xl cursor-zoom-in group relative"
-                    onClick={(e) => { e.stopPropagation(); setZoomedImage(selectedOfficial.imageUrl); }}
-                >
-                  <img src={selectedOfficial.imageUrl} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ZoomIn className="text-white w-6 h-6" />
-                  </div>
+                    {selectedOfficial && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6 overflow-hidden">
+                            <div className="absolute inset-0 bg-slate-950/98 backdrop-blur-2xl" onClick={() => setSelectedOfficial(null)}></div>
+                            <div className="relative w-full max-w-4xl bg-slate-900 md:rounded-[3.5rem] h-full md:h-auto md:max-h-[92vh] overflow-y-auto no-scrollbar border border-slate-800 shadow-2xl animate-fade-in flex flex-col">
+                                <div className="p-8 md:p-12 border-b border-slate-800 flex justify-between items-center">
+                                    <div className="flex items-center gap-6">
+                                        <img src={selectedOfficial.imageUrl} className="w-20 h-20 rounded-[2rem] border-2 border-blue-500/30 cursor-zoom-in" onClick={() => setZoomedImage(selectedOfficial.imageUrl)} />
+                                        <div><h2 className="text-3xl font-black text-white tracking-tighter mb-1">{selectedOfficial.fullName}</h2><span className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] text-blue-500 font-black uppercase">{selectedOfficial.years}</span></div>
+                                    </div>
+                                    <button onClick={() => setSelectedOfficial(null)} className="p-4 bg-slate-800 hover:bg-red-500/20 rounded-2xl text-slate-400 transition-all active:scale-90"><i data-lucide="x" className="w-6 h-6"></i></button>
+                                </div>
+                                <div className="p-8 md:p-16 space-y-24">
+                                    <section className="space-y-12">
+                                        <h3 className="text-white font-black text-xl flex items-center gap-6 underline decoration-blue-500 decoration-4 underline-offset-8"><i data-lucide="fingerprint" className="text-blue-500"></i>ניתוח אטימולוגי של השם המלא</h3>
+                                        <div className="grid gap-8">{selectedOfficial.etymology.map((et, i) => (<div key={i} className="p-10 bg-slate-800/30 rounded-[2.5rem] border border-slate-800 relative group"><div className="absolute -right-4 top-0 bottom-0 w-1 bg-blue-600/20 group-hover:bg-blue-600 transition-colors rounded-full"></div><span className="text-blue-500 font-black block mb-4 text-xs uppercase tracking-widest">{et.label}</span><p className="text-xl font-light leading-relaxed text-justify text-slate-200">{et.content}</p></div>))}</div>
+                                    </section>
+                                    <section className="space-y-12">
+                                        <h3 className="text-white font-black text-xl flex items-center gap-6 underline decoration-blue-500 decoration-4 underline-offset-8"><i data-lucide="book-open" className="text-blue-500"></i>ילדות, שושלת וחינוך מוקדם</h3>
+                                        <div className="grid grid-cols-1 gap-8">
+                                            {['background', 'family', 'education'].map((key) => (<div key={key} className="p-10 bg-slate-800/20 rounded-[3rem] border border-slate-800/50"><h4 className="text-blue-500 font-black text-[10px] uppercase mb-6 tracking-widest">{key === 'background' ? 'רקע' : key === 'family' ? 'משפחה' : 'חינוך'}</h4><p className="text-slate-300 text-lg leading-relaxed font-light text-justify">{selectedOfficial.earlyLife[key]}</p></div>))}
+                                        </div>
+                                    </section>
+                                    <section className="space-y-12">
+                                        <h3 className="text-white font-black text-xl flex items-center gap-6 underline decoration-blue-500 decoration-4 underline-offset-8"><i data-lucide="pocket" className="text-blue-500"></i>ניתוח לבוש וסממנים חזותיים מורחב</h3>
+                                        <div className="grid gap-8">{selectedOfficial.clothing.map((cl, i) => (<div key={i} className="p-10 bg-slate-800/50 rounded-[3rem] border border-slate-700/50 hover:bg-slate-800/80 transition-all"><h4 className="font-black text-white mb-4 text-2xl border-r-4 border-blue-500 pr-5">{cl.item}</h4><p className="text-xl opacity-90 text-justify leading-relaxed text-slate-300 font-light">{cl.content}</p></div>))}</div>
+                                    </section>
+                                    <section className="p-12 bg-blue-600/10 rounded-[4rem] border border-blue-500/20 relative overflow-hidden">
+                                        <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full -translate-x-32 -translate-y-32 blur-[100px]"></div>
+                                        <div className="relative z-10 space-y-8"><span className="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em]">תפיסה אידיאולוגית ואסטרטגית</span><h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-tight">{selectedOfficial.ideology.core}</h3><p className="text-xl opacity-90 italic text-justify leading-relaxed text-slate-300 font-light pr-10 border-r-4 border-blue-500/30">{selectedOfficial.ideology.details}</p></div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {zoomedImage && (
+                        <div className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 cursor-zoom-out animate-fade-in" onClick={() => setZoomedImage(null)}>
+                            <img src={zoomedImage} className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain" />
+                        </div>
+                    )}
                 </div>
-                <div>
-                  <h2 className="text-3xl font-black text-white tracking-tighter mb-1">{selectedOfficial.fullName}</h2>
-                  <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] text-blue-500 font-black tracking-widest uppercase">
-                      {selectedOfficial.years}
-                    </span>
-                    <span className="text-slate-500 text-xs font-medium">ביוגרפיה אסטרטגית מורחבת</span>
-                  </div>
-                </div>
-              </div>
-              <button onClick={() => setSelectedOfficial(null)} className="p-4 bg-slate-800 hover:bg-slate-700 rounded-2xl text-slate-400 hover:text-white transition-all active:scale-90">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="p-8 md:p-16 space-y-24">
-              
-              {/* Etymology Section */}
-              <section className="space-y-12">
-                <div className="flex items-center gap-6">
-                  <div className="bg-blue-600/20 p-3 rounded-2xl"><Fingerprint className="text-blue-500 w-6 h-6" /></div>
-                  <h3 className="text-white font-black text-xl tracking-tight uppercase tracking-widest underline decoration-blue-500 decoration-4 underline-offset-8">ניתוח אטימולוגי של השם המלא</h3>
-                </div>
-                <div className="grid gap-8">
-                  {selectedOfficial.etymology.map((et, i) => (
-                    <div key={i} className="relative group">
-                      <div className="absolute -right-4 top-0 bottom-0 w-1 bg-blue-600/20 group-hover:bg-blue-600 transition-colors rounded-full"></div>
-                      <div className="p-10 bg-slate-800/30 rounded-[2.5rem] border border-slate-800/50 hover:bg-slate-800/50 transition-all">
-                        <span className="text-blue-500 font-black block mb-4 text-xs uppercase tracking-[0.3em]">{et.label}</span>
-                        <p className="text-xl leading-relaxed text-justify text-slate-200 font-light">{et.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <div className="h-px bg-gradient-to-l from-transparent via-slate-800 to-transparent"></div>
-
-              {/* Early Life Section */}
-              <section className="space-y-12">
-                <div className="flex items-center gap-6">
-                  <div className="bg-blue-600/20 p-3 rounded-2xl"><BookOpen className="text-blue-500 w-6 h-6" /></div>
-                  <h3 className="text-white font-black text-xl tracking-tight uppercase tracking-widest underline decoration-blue-500 decoration-4 underline-offset-8">ילדות, משפחה וחינוך מוקדם</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                  <div className="p-8 bg-slate-800/20 rounded-[2.5rem] border border-slate-800/50">
-                    <h4 className="text-blue-500 font-black text-[10px] uppercase mb-6 tracking-widest">רקע ביוגרפי ונסיבות לידה</h4>
-                    <p className="text-slate-300 text-lg leading-relaxed font-light text-justify">{selectedOfficial.earlyLife.background}</p>
-                  </div>
-                  <div className="p-8 bg-slate-800/20 rounded-[2.5rem] border border-slate-800/50">
-                    <h4 className="text-blue-500 font-black text-[10px] uppercase mb-6 tracking-widest">הקשר משפחתי ודמויות השפעה</h4>
-                    <p className="text-slate-300 text-lg leading-relaxed font-light text-justify">{selectedOfficial.earlyLife.family}</p>
-                  </div>
-                  <div className="p-8 bg-slate-800/20 rounded-[2.5rem] border border-slate-800/50">
-                    <h4 className="text-blue-500 font-black text-[10px] uppercase mb-6 tracking-widest">מסלול השכלה והכשרה</h4>
-                    <p className="text-slate-300 text-lg leading-relaxed font-light text-justify">{selectedOfficial.earlyLife.education}</p>
-                  </div>
-                </div>
-              </section>
-
-              {/* Clothing Section - EXPANDED */}
-              <section className="space-y-12">
-                <div className="flex items-center gap-6">
-                  <div className="bg-blue-600/20 p-3 rounded-2xl"><Pocket className="text-blue-500 w-6 h-6" /></div>
-                  <h3 className="text-white font-black text-xl tracking-tight uppercase tracking-widest underline decoration-blue-500 decoration-4 underline-offset-8">ניתוח לבוש וסממנים חזותיים מורחב</h3>
-                </div>
-                <div className="grid grid-cols-1 gap-8">
-                  {selectedOfficial.clothing.map((cl, i) => (
-                    <div key={i} className="p-10 bg-slate-800/50 rounded-[3rem] border border-slate-700/50 group hover:bg-slate-800/80 transition-all">
-                      <h4 className="font-black text-white mb-4 text-2xl tracking-tight group-hover:text-blue-400 transition-colors border-r-4 border-blue-500 pr-5">{cl.item}</h4>
-                      <p className="text-xl opacity-90 text-justify leading-relaxed text-slate-300 font-light">{cl.content}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* Ideology Section */}
-              <section className="p-12 bg-blue-600/10 rounded-[4rem] border border-blue-500/20 relative overflow-hidden">
-                <span className="text-blue-500 font-black text-[10px] uppercase tracking-[0.4em]">תפיסה אידיאולוגית ואסטרטגית</span>
-                <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-tight mt-6">{selectedOfficial.ideology.core}</h3>
-                <p className="text-xl opacity-90 italic text-justify leading-relaxed text-slate-300 font-light pr-10 border-r-4 border-blue-500/30 mt-6">{selectedOfficial.ideology.details}</p>
-              </section>
-
-              {/* Achievements Section */}
-              <section className="pb-20 space-y-12">
-                <h3 className="text-white font-black text-xl tracking-tight uppercase tracking-widest underline decoration-blue-500 decoration-4 underline-offset-8">הישגים ותרומה היסטורית</h3>
-                <div className="grid gap-4">
-                  {selectedOfficial.achievements.list.map((ach, i) => (
-                    <div key={i} className="flex gap-6 items-start p-8 bg-slate-800/40 rounded-[2rem] border border-slate-800 group hover:border-blue-500/30 transition-all">
-                      <div className="w-4 h-4 rounded-full bg-blue-600 mt-2 shrink-0 group-hover:scale-125 transition-transform shadow-[0_0_10px_rgba(37,99,235,0.4)]"></div>
-                      <span className="text-slate-200 text-xl leading-relaxed font-light">{ach}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Zoom Modal */}
-      {zoomedImage && (
-          <div className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 cursor-zoom-out" onClick={() => setZoomedImage(null)}>
-              <img src={zoomedImage} className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain animate-fade-in" />
-          </div>
-      )}
-
-      <footer className="mt-auto py-16 text-center opacity-40">
-          <div className="flex justify-center gap-4 mb-4">
-            <Database className="w-4 h-4" /><Binary className="w-4 h-4" /><Cpu className="w-4 h-4" />
-          </div>
-        <p className="text-[10px] uppercase tracking-[0.5em] font-black text-slate-600">
-          © 2026 מרכז המחקר האנתרופולוגי - S25 ULTRA OPTIMIZED
-        </p>
-      </footer>
-    </div>
-  );
-};
-
-export default App;
+            );
+        };
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
 
